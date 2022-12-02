@@ -1,5 +1,5 @@
-import { generate } from '../Helpers/GenerateToken';
-import Model from './Model';
+import GenerateToken from '../Helpers/GenerateToken.js';
+import Model from './Model.js';
 //bring in the DB
 let userdb = new Localbase('BPT-USERS-DB');
 // build table
@@ -8,7 +8,7 @@ let usersTable = userdb.collection('user');
 class Users extends Model{
     create(name, age, docContact) {
         let userData = {
-            id: generate(),
+            id: new GenerateToken.generate(),
             nuser_name: name,
             user_age: age,
             user_doc: docContact

@@ -1,5 +1,5 @@
-import Model from "./Model";
-import Increment from '../Helpers/Increment';
+import Model from "./Model.js";
+import Increment from '../Helpers/Increment.js';
 //bring in the DB
 let userdb = new Localbase('BPT-USERS-DB');
 // build table

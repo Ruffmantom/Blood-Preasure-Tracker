@@ -1,6 +1,6 @@
 class Model{
     constructor(){
-        super();
+        // super();
         this.id = localStorage.getItem('local-inc')
         this.created_at = new Date().toString()
     }
