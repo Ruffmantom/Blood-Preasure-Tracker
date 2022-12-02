@@ -3,4 +3,11 @@
     padding: 0;
     box-sizing: border-box;
     font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.5;
 }
+textarea, input,button{
+    border: none;
+    display: inline-block;
+    outline: none;
+    all: unset;
+  }

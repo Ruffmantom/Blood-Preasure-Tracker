@@ -47,7 +47,7 @@ class Toast extends HTMLElement {
       },
       standard: {
         bkg: "#ffffff",
-        border: "#f7f7f7",
+        border: "#f5f5f5",
         color: "#1f1f1f",
       },
     };
