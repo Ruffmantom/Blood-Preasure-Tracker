@@ -87,5 +87,5 @@ class Toast extends HTMLElement {
     }
   }
 }
-
-window.customElements.define("toast-component", Toast);
+// USE IN HTML: <toast-component title="Welcome!" message="Thank you for being a toast! " theme="standard"></toast-component>
+customElements.define("toast-component", Toast);

@@ -10,59 +10,43 @@
   <script src="https://kit.fontawesome.com/39026cc83f.js" crossorigin="anonymous"></script>
   <!-- App styles -->
   <link rel="stylesheet" href="Public/styles/clear.css" />
+  <link rel="stylesheet" href="Public/styles/ruffstyles.css" />
   <link rel="stylesheet" href="Public/styles/style.css" />
   <title>My BPT</title>
 </head>
 
 <body>
+
   <div class="container">
-    <div class="row_mxw">
-      <div class="col">
+    <div class="row">
+      <div class="col col_2 col_md">
         <h1>Welcome!</h1>
         <p class="title_secondary">Sign Up to start tracking! This app shows stats for your blood preasure levels daily,
           monthly and yearly.</p>
-
-        <div class="mt-2 form">
-          <h4 class="mt-1"> Please Fill out the form below</h4>
-          <div class="form_sec">
-            <input id="" class="form_elm_sml" type="text" maxlength="255" placeholder="Enter Name" name="name">
-          </div>
-          <div class="form_sec">
-            <input id="" class="form_elm_sml" type="number" maxlength="3" placeholder="Enter Age" name="age">
-          </div>
-          <div class="form_sec">
-            <input id="" class="form_elm_sml" type="text" maxlength="255" placeholder="Enter Doctors Name" name="doc-contact">
-          </div>
-          <div class="form_sec">
-            <input id="doc-contact" class="form_elm_sml form-control" type="tel" name="doc-contact">
-          </div>
-          <button id="create-user" class="btn btn_primary">Create User</button>
-        </div>
+      </div>
+      <div class="col col_2 mb_hidden"></div>
+    </div>
+    <div class="row">
+      <div class="col col_1">
+        <!-- register form -->
+        <register-form></register-form>
       </div>
     </div>
   </div>
 
 
-  <toast-component title="Welcome!" message="Thank you for being a toast! " theme="standard"></toast-component>
-
-
-
-
-
-  
+  <!-- Bottom Script Tags -->
   <!-- jquery -->
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-  <!-- telephone format -->
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/8.4.7/js/intlTelInput.js"></script> -->
-  <!-- components -->
-  <script src="./Public/Components/_toast.js"></script>
-  <!-- End components -->
   <!-- local base -->
   <script src="https://unpkg.com/localbase/dist/localbase.min.js"></script>
-  <!-- DB -->
-  <!-- <script src="./Database/script.js"></script> -->
+  <!-- Components -->
+  <script src="./Public/Components/_registerForm.js" defer></script>
+  <script src="./Public/Components/_flash.js" defer></script>
+  <!-- <script  src="./Public/Components/_toast.js" ></script> -->
   <!-- Main index -->
   <script type="module" src="./Public/js/script.js"></script>
+
 </body>
 
 </html>

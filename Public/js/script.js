@@ -1,16 +1,31 @@
-import Users from '../../Database/Models/Users.js';
-import Chart from '../../Database/Models/Chart.js';
+// import DoctorsController from '../../Database/Controllers/DoctorsController.js';
+import UsersController from '../../Database/Controllers/UsersController.js';
 
-let user = new Users;
-let chart = new Chart;
+let user = new UsersController;
+// let chart = new C;
+// let doctor = new DoctorsController;
 
 // bring in buttons
-const createUserBtn = $('#create-user');
-
+const createUserBtn = $('#create_user_btn');
+// bring in inputs
+const nameInput = $('#name_input');
+const ageInput = $('#age_input');
+// const nameInput = $('#')
+// const nameInput = $('#')
+// const nameInput = $('#')
 $(()=>{
+    let userName = '';
+    let userAge = '';
     createUserBtn.click((e)=>{
         e.preventDefault();
-        console.log('clicked')
+        // create user
+        user.create(nameInput,ageInput)
+    })
+    nameInput.on("input", function() {
+        userName = this.value;
+    })
+    ageInput.on("input", function() {
+        userAge = this.value;
     })
 })
 

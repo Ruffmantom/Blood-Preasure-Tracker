@@ -7,16 +7,16 @@ let chartTable = userdb.collection('chart');
 
 class Chart extends Model{
 
-    create(user_id,_high,_low) {
+    create(_user_id,_high,_low) {
         let userData = {
             id: this.id,
             high:_high,
             low:_low,
-            u_id:user_id,
+            user_id:_user_id,
             created_at: this.created_at
         }
         // add user to db
-        usersTable.add(userData)
+        chartTable.add(userData)
         // increase local in ++ for next user
         let i = new Increment()
         i.inc();
