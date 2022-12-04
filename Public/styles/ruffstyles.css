@@ -347,7 +347,11 @@ input {
     border: 1px solid var(--light-primary-darker);
     border-radius: var(--stnd-border-radius);
 }
-
+.input_error{
+    color:var(--danger);
+    font-size: 12px;
+    padding-top: 5px;
+}
 .form_elm {
     padding: 10px;
 }

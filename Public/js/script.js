@@ -113,30 +113,30 @@ $(() => {
     // handle Username
     if (d.username.length <= 2 || d.username.length >= 21) {
       validation.username_val.err_message =
-        "Please enter a username between 3 - 20 Characters.";
+        "*Please enter a username between 3 - 20 Characters.";
     } else if (d.username.length === 0 || d.username == null) {
-      validation.username_val.err_message = "Please enter a username.";
+      validation.username_val.err_message = "*Please enter a username.";
     } else {
       validation.username_val.err_message = "";
       validation.username_val.verified = true;
     }
     // handle name
     if (d.name.length === 0 || d.name == null) {
-      validation.name_val.err_message = "Please enter an age.";
+      validation.name_val.err_message = "*Please enter your name.";
     } else {
       validation.name_val.err_message = "";
       validation.name_val.verified = true;
     }
     // handle age
     if (d.age == 0 || d.age == null) {
-      validation.age_val.err_message = "Please enter an age.";
+      validation.age_val.err_message = "*Please enter an age.";
     } else {
       validation.age_val.err_message = "";
       validation.age_val.verified = true;
     }
     // handle password
     if (d.password.length == 0) {
-      validation.password_val.err_message = "Please enter a password.";
+      validation.password_val.err_message = "*Please enter a password.";
     } else {
       validation.password_val.err_message = "";
       validation.password_val.verified = true;
@@ -145,10 +145,10 @@ $(() => {
     if (confirmed) {
       validation.confirm_val.err_message = "";
       validation.confirm_val.verified = true;
-    } else if (d.userconfirmgth == 0) {
-      validation.confirm_val.err_message = "Please confirm your password.";
+    } else if (d.confirmed_pass.length == 0 || d.confirmed_pass == null) {
+      validation.confirm_val.err_message = "*Please confirm your password.";
     } else {
-      validation.confirm_val.err_message = "Passwords dont match";
+      validation.confirm_val.err_message = "*Passwords dont match";
     }
     // now if they are false show errors
     Object.keys(validation).forEach((i) => {
@@ -157,13 +157,32 @@ $(() => {
         sendit = true;
       } else {
         console.log("there are errors in the form");
+        // sendErrors()
         sendit = false;
       }
     });
     console.log(validation);
     return sendit;
   };
-
+  // send errors to dom
+  const sendErrors = () => {
+    let errortags = Array.from($('.input_error'))
+    errortags.forEach((t)=>{
+        let errtag = t.dataset.error
+        let err;
+       if(validation.hasOwnProperty(errtag)){
+       err = validation[errtag]
+       $(t).text('')
+       if(err.verified){
+           $(t).text('')
+           return
+        }else{
+            //    console.log(err.err_message)
+            $(t).text(err.err_message)
+        }
+    }
+    })
+  };
   // retrieve the values from inputs
   userNameInput.on("input", function () {
     user_username = this.value;
@@ -202,6 +221,7 @@ $(() => {
       name: user_name.replace(/(<([^>]+)>)/gi, "").trim(),
       age: user_age,
       password: user_password.replace(/(<([^>]+)>)/gi, "").trim(),
+      confirmed_pass: confirm_pass,
     };
     // usage
     if (usage === "newuser") {
@@ -209,6 +229,8 @@ $(() => {
       // validation helper
       if (validationHelper(data)) {
         flashHelper("Congrats! Your account has been created!", "cheer");
+      }else{
+        sendErrors();
       }
     } else {
       //login
