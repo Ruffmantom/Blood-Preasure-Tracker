@@ -28,7 +28,8 @@
 }
 
 .flash_container {
-  max-width: 80%;
+  max-width: 90%;
+  width: 100%;
   position: absolute;
   z-index: 999;
   top: 20px;
@@ -43,7 +44,8 @@
 /* .flash_title_col {} */
 
 .flash_title {
-  padding-left: 5px;
+  padding: 0 10px;
+  text-align: center;
 }
 
 /* .flash_close_col {} */
