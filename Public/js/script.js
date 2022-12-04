@@ -164,24 +164,43 @@ $(() => {
     console.log(validation);
     return sendit;
   };
+  const resetValidation = () => {
+    validation.username_val.verified = false;
+    validation.username_val.err_message = "";
+    validation.age_val.verified = false;
+    validation.age_val.err_message = "";
+    validation.name_val.verified = false;
+    validation.name_val.err_message = "";
+    validation.password_val.verified = false;
+    validation.password_val.err_message = "";
+    validation.confirm_val.verified = false;
+    validation.confirm_val.err_message = "";
+  };
+  const clearInputs = () => {
+    userNameInput.val("");
+    nameInput.val("");
+    ageInput.val("");
+    passwordInput.val("");
+    confirmInput.val("");
+  };
   // send errors to dom
   const sendErrors = () => {
-    let errortags = Array.from($('.input_error'))
-    errortags.forEach((t)=>{
-        let errtag = t.dataset.error
-        let err;
-       if(validation.hasOwnProperty(errtag)){
-       err = validation[errtag]
-       $(t).text('')
-       if(err.verified){
-           $(t).text('')
-           return
-        }else{
-            //    console.log(err.err_message)
-            $(t).text(err.err_message)
+    let errortags = Array.from($(".input_error"));
+
+    errortags.forEach((t) => {
+      let errtag = t.dataset.error;
+      let err;
+      $(t).text("");
+      if (validation.hasOwnProperty(errtag)) {
+        err = validation[errtag];
+        if (!err.verified) {
+          //    console.log(err.err_message)
+          $(t).text(err.err_message);
+        } else {
+          $(t).fadeOut();
         }
-    }
-    })
+      }
+    });
   };
   // retrieve the values from inputs
   userNameInput.on("input", function () {
@@ -229,9 +248,10 @@ $(() => {
       // validation helper
       if (validationHelper(data)) {
         flashHelper("Congrats! Your account has been created!", "cheer");
-      }else{
-        sendErrors();
+        resetValidation();
+        clearInputs();
       }
+      sendErrors();
     } else {
       //login
       // validation helper
