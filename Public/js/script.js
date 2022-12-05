@@ -1,5 +1,5 @@
 // import DoctorsController from '../../Database/Controllers/DoctorsController.js';
-// import UsersController from "../../Database/Controllers/UsersController.js";
+import UsersController from "../../Database/Controllers/UsersController.js";
 
 // let user = new UsersController();
 // let chart = new C;
@@ -13,7 +13,8 @@ const ageInput = $("#age_input");
 const userNameInput = $("#user_name_input");
 const passwordInput = $("#password_input");
 const confirmInput = $("#confirm_password_input");
-
+// get user controller
+let user = new UsersController();
 // flash helper
 const flashHelper = (message, theme) => {
   // return style helper
@@ -111,6 +112,14 @@ $(() => {
     // check and see if the data has been entered
     let sendit = false;
     // handle Username
+    async () => {
+      let usernamtTaken = await user.verifyUsername(d.username);
+      if (usernamtTaken) {
+        validation.username_val.err_message =
+          "Sorry that username has already been taken";
+      }
+      console.log(usernamtTaken);
+    };
     if (d.username.length <= 2 || d.username.length >= 21) {
       validation.username_val.err_message =
         "*Please enter a username between 3 - 20 Characters.";
@@ -120,6 +129,7 @@ $(() => {
       validation.username_val.err_message = "";
       validation.username_val.verified = true;
     }
+
     // handle name
     if (d.name.length === 0 || d.name == null) {
       validation.name_val.err_message = "*Please enter your name.";
@@ -240,23 +250,33 @@ $(() => {
       name: user_name.replace(/(<([^>]+)>)/gi, "").trim(),
       age: user_age,
       password: user_password.replace(/(<([^>]+)>)/gi, "").trim(),
-      confirmed_pass: confirm_pass,
+      confirmed_pass: confirm_pass.trim(),
     };
+
     // usage
     if (usage === "newuser") {
       // signup
       // validation helper
       if (validationHelper(data)) {
-        flashHelper("Congrats! Your account has been created!", "cheer");
-        resetValidation();
-        clearInputs();
+        // if (usernameTaken !== false) {
+        //   flashHelper(usernameTaken, "danger");
+        // } else {
+        //   user.create(data.username, data.name, data.age, data.password);
+        //   flashHelper("Congrats! Your account has been created!", "cheer");
+        //   resetValidation();
+        //   clearInputs();
+        // }
       }
       sendErrors();
     } else {
       //login
-      // validation helper
+      let login_data = {
+        username: data.username,
+        password: data.password,
+      };
+      user.login(login_data);
 
-      console.log(data);
+      console.log(login_data);
       flashHelper("Successful Login", "notify");
     }
   });
