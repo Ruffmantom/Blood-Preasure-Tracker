@@ -1,31 +1,30 @@
+import FlashHelper from "../Helpers/FlashHelper.js";
 import Model from "./Model.js";
 //bring in the DB
 let userdb = new Localbase("BPT-USERS-DB");
 // build table
 let usersTable = userdb.collection("user");
 
+userdb.config.debug = false;
+
+
 class Users extends Model {
-  checkUsername(_username) {
-    usersTable
-      .doc({ username: _username })
-      .get()
-      .then((response) => {
-        return true;
-    }).catch(error=>{
-          return false;
-      })
-  }
   create(userData) {
     // add user to db
     usersTable.add(userData).add().then(response => {
-        console.log('Add successful, now do something.')
-        return 'Account has been created!'
+      console.log('Add successful, now do something.')
+      return 'Account has been created!'
     })
-    .catch(error => {
+      .catch(error => {
         console.log('There was an error, do something else.')
-        return 'There was an error creating account: ' + error; 
+        return 'There was an error creating account: ' + error;
       })
   }
+  async getAllUsers() {
+    // console.log(await usersTable.get())
+    return await usersTable.get();
+  }
+  // login
   login(_username, _pass) {
     // verify user exists
     usersTable

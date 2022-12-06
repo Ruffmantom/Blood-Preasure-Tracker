@@ -81,6 +81,7 @@ $(() => {
   // hide things that dont need to be seen
   $(".flash_container").attr("hidden", true);
   let user_username = "";
+  let userNameCheck = false;
   let user_name = "";
   let user_age = "";
   let user_password = "";
@@ -112,14 +113,6 @@ $(() => {
     // check and see if the data has been entered
     let sendit = false;
     // handle Username
-    async () => {
-      let usernamtTaken = await user.verifyUsername(d.username);
-      if (usernamtTaken) {
-        validation.username_val.err_message =
-          "Sorry that username has already been taken";
-      }
-      console.log(usernamtTaken);
-    };
     if (d.username.length <= 2 || d.username.length >= 21) {
       validation.username_val.err_message =
         "*Please enter a username between 3 - 20 Characters.";
@@ -167,11 +160,9 @@ $(() => {
         sendit = true;
       } else {
         console.log("there are errors in the form");
-        // sendErrors()
         sendit = false;
       }
     });
-    console.log(validation);
     return sendit;
   };
   const resetValidation = () => {
@@ -212,10 +203,29 @@ $(() => {
       }
     });
   };
+  // async find username
+  async function findUsername() {
+    let check = await user.verifyUsername(user_username)
+    // check username as user types
+    if (check) {
+      $('#username_input').fadeIn()
+      $('#username_input').text('Sorry this username is taken')
+      userNameCheck = false
+      console.log('Input: ' + check)
+    } else {
+      $('#username_input').text('')
+      userNameCheck = true
+      console.log('Input: Username Good to GO!: ', check)
+    }
+  }
   // retrieve the values from inputs
   userNameInput.on("input", function () {
-    user_username = this.value;
+    user_username = this.value.trim();
   });
+  userNameInput.on("blur", function () {
+    findUsername()
+  });
+  userNameInput.on('')
   nameInput.on("input", function () {
     user_name = this.value;
   });
@@ -257,17 +267,17 @@ $(() => {
     if (usage === "newuser") {
       // signup
       // validation helper
-      if (validationHelper(data)) {
-        // if (usernameTaken !== false) {
-        //   flashHelper(usernameTaken, "danger");
-        // } else {
-        //   user.create(data.username, data.name, data.age, data.password);
-        //   flashHelper("Congrats! Your account has been created!", "cheer");
-        //   resetValidation();
-        //   clearInputs();
-        // }
+      if (validationHelper(data) && userNameCheck) {
+        console.log("On submit: " + confirmed+ " Create User")
+        // user.create(data.username, data.name, data.age, data.password);
+        // flashHelper("Congrats! Your account has been created!", "cheer");
+        resetValidation();
+        clearInputs();
+      } else {
+        console.log("On submit: " + confirmed+" Decline User")
+        // show errors
+        sendErrors();
       }
-      sendErrors();
     } else {
       //login
       let login_data = {
