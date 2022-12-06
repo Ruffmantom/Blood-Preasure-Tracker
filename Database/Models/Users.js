@@ -1,24 +1,36 @@
-import FlashHelper from "../Helpers/FlashHelper.js";
 import Model from "./Model.js";
-//bring in the DB
-let userdb = new Localbase("BPT-USERS-DB");
-// build table
-let usersTable = userdb.collection("user");
-
-userdb.config.debug = false;
-
-
+// database will be with local storage
 class Users extends Model {
   create(userData) {
     // add user to db
-    usersTable.add(userData).add().then(response => {
-      console.log('Add successful, now do something.')
-      return 'Account has been created!'
-    })
-      .catch(error => {
-        console.log('There was an error, do something else.')
-        return 'There was an error creating account: ' + error;
-      })
+    console.log("User Model -> create() user: ", userData)
+    // usersTable.add({ userData }).then(response => {
+    //   console.log("User Model -> create() user SUCCESS: ", response)
+    // }).catch(error => {
+    //   console.log("User Model -> create() user ERROR: ", error)
+    // })
+
+    const request = indexedDB.open('users');
+    let db;
+
+    request.onerror = function (event) {
+      console.log('User Model ERROR with IndexedDB', event)
+    }
+
+    request.onsuccess = function () {
+      db = request.result;
+      const transaction = db.transaction('users', 'readwrite')
+
+      const store = transaction.objectStore('users')
+      store.put(userData).onsuccess = function(e) {
+        const key = e.target.result;
+        console.log("User Model store.put: ",key);
+      };
+    };
+
+
+
+
   }
   async getAllUsers() {
     // console.log(await usersTable.get())

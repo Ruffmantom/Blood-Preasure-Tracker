@@ -25,7 +25,9 @@ class UsersController {
 
         return userFound;
     }
+    // create user
     create(_username, _name, _age, _password) {
+        //bind values as obj
         let userData = {
             id: GenerateToken.generate(),
             username: _username,
@@ -33,18 +35,11 @@ class UsersController {
             age: _age,
             password: _password,
         };
+        console.log("User Controller -> create() user: ", userData)
         // store user
         let user = new Users();
         // create user
-        try {
-            user.create(userData)
-            // when the user has been created
-            // show flash message
-            FlashHelper.show("User Created!", "cheer", 1000);
-        } catch (error) {
-            console.log('error creating user')
-            return error;
-        }
+        user.create(userData)
     }
     login(u_username, u_pass) {
         // return erros if unsuccessful login

@@ -4,7 +4,7 @@ import UsersController from "../../Database/Controllers/UsersController.js";
 // let user = new UsersController();
 // let chart = new C;
 // let doctor = new DoctorsController;
-
+console.log('page loaded')
 // bring in buttons
 const submitRegOrLogBtn = $("#reg_log_submit_btn");
 // bring in inputs
@@ -262,19 +262,21 @@ $(() => {
       password: user_password.replace(/(<([^>]+)>)/gi, "").trim(),
       confirmed_pass: confirm_pass.trim(),
     };
-
-    // usage
+    let { username, name, age, password } = data;
+    // usage (both register and login page use this function)
+    // so we need to find the usage
     if (usage === "newuser") {
       // signup
       // validation helper
       if (validationHelper(data) && userNameCheck) {
-        console.log("On submit: " + confirmed+ " Create User")
-        // user.create(data.username, data.name, data.age, data.password);
+        console.log("On submit: ", confirmed, " Create User")
+        user.create(username, name, age, password);
         // flashHelper("Congrats! Your account has been created!", "cheer");
+
         resetValidation();
         clearInputs();
       } else {
-        console.log("On submit: " + confirmed+" Decline User")
+        console.log("On submit: ", confirmed, " Decline User")
         // show errors
         sendErrors();
       }
