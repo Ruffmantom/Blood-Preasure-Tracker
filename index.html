@@ -5,21 +5,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-
+  <meta name="apple-mobile-web-app-status-bar" content="#db4938" />
+  <meta name="theme-color" content="#000000" />
   <link rel="stylesheet" href="./styles/clear.css">
   <link rel="stylesheet" href="./styles/ruffstyles.css">
   <link rel="stylesheet" href="./styles/style.css">
   <link rel="manifest" href="./manifest.json">
   <!-- ios support -->
   <link rel="apple-touch-icon" href="./assets/images/mybp-app-logo.png" />
-  <meta name="apple-mobile-web-app-status-bar" content="#db4938" />
-  <meta name="theme-color" content="#000000" />
-
-  <!-- jquery -->
-  <script src="./js/libraries/jquery.js"></script>
-
   <link rel="icon" type="image/x-icon" href="./assets/icons/mybp-app-logo-96x96.ico">
+  <!-- jquery -->
   <title>Blood Pressure Tracker</title>
+  <script src="./js/libraries/jquery.js"></script>
 </head>
 
 <body>
@@ -107,7 +104,8 @@
     </div>
   </div>
 
-
+  <!-- service worker -->
+  <script src="./utils/main.js"></script>
   <!-- script links -->
   <script src="./js/helpers.js"></script>
   <script src="./js/createHtml.js"></script>
