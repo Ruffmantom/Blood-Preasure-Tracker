@@ -190,8 +190,8 @@ input {
   border-radius: 5px;
 }
 
-.settings_btn_cont>svg {
-  max-width: 18px;
+.settings_btn_cont>img,.close_settings_btn_cont>img {
+  max-width: 16px;
 }
 
 #close_settings_btn,

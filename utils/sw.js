@@ -13,7 +13,9 @@ var filesToCache = [
   "../assets/icons/mybp-app-logo-72x72.ico",
   "../assets/icons/mybp-app-logo-96x96.ico",
   "../assets/icons/mybp-app-logo-128x128.ico",
-  "../assets/icons/mybp-app-logo-256x256.ico"
+  "../assets/icons/mybp-app-logo-256x256.ico",
+  "../assets/icons/close.png",
+  "../assets/icons/settings.png"
 ];
 
 self.addEventListener("install", function (e) {
