@@ -1,4 +1,4 @@
-const staticDevBp = "bp-site-v4"
+const staticDevBp = "bp-site-v1"
 const assets = [
   "/",
   "/index.html",
