@@ -113,7 +113,7 @@ input {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
+  width: 0%;
   height: 100%;
   display: flex;
   justify-content: center;
@@ -135,10 +135,14 @@ input {
   justify-content: space-between;
 }
 
+.menu_overlay_cont>.menu_inner {
+  display: none;
+}
+
 .menu_overlay_cont {
   opacity: 0;
   z-index: -1;
-  transition: all 150ms ease-out;
+  transition: opacity 150ms ease-out;
 }
 
 .menu_content {
@@ -149,21 +153,31 @@ input {
 }
 
 .menu_overlay_cont.active {
+  width: 100%;
+}
+
+.menu_overlay_cont.active>.menu_inner {
+  display: block;
+}
+
+.menu_overlay_cont.active {
   opacity: 1;
   z-index: 9999;
-  transition: all 150ms ease-in;
+  transition: opacity 150ms ease-in;
 }
 
 .end_of_data_note {
   text-align: center;
   font-size: 12px;
 }
-.app_header{
+
+.app_header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
 }
+
 .close_settings_btn_cont,
 .settings_btn_cont {
   width: 35px;
@@ -199,21 +213,25 @@ input {
   padding-top: 15px;
 }
 
-.danger{
+.danger {
   background-color: var(--bp-red);
 }
-.caution{
+
+.caution {
   background-color: var(--bp-o);
 }
-.normal{
+
+.normal {
   background-color: var(--bp-blu);
 }
-#download_csv_btn{
+
+#download_csv_btn {
   margin-top: 0;
   margin-bottom: 15px;
 }
-#download_csv_btn>svg{
-max-width: 18px;
-fill: white;
-margin-left: 10px;
+
+#download_csv_btn>svg {
+  max-width: 18px;
+  fill: white;
+  margin-left: 10px;
 }

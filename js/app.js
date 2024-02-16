@@ -14,14 +14,14 @@ const saveToLocal = () => {
 }
 
 const renderCards = () => {
-    console.log("Render Cards has started...")
+    // console.log("Render Cards has started...")
     // when re rendering be sure to empty div
     $(".bp_data_cont").empty()
 
     if (userLoaded && globalUser.bp_data.length >= 1) {
-        console.log("About to render cards...")
+        // console.log("About to render cards...")
         globalUser.bp_data.forEach(d => {
-            console.log("Data: ", d)
+            // console.log("Data: ", d)
             $(".bp_data_cont").prepend(createDataCard(d))
         });
     } else {
@@ -34,7 +34,7 @@ const loadUserOrCreate = () => {
     // check local storage, if no user then create
     let localUser = localStorage.getItem('BP_TR_USER')
     if (localUser === null || localUser === undefined) {
-        console.log('lets create a new user!')
+        // console.log('lets create a new user!')
         localStorage.setItem('BP_TR_USER', JSON.stringify(defaultUser))
         globalUser = defaultUser
         userLoaded = true
@@ -100,7 +100,7 @@ $(() => {
         if(globalUser.bp_data.length >= 1){
             downloadCSV(globalUser.bp_data, `BP-${formattedName}.csv`)
         }
-        
+
     })
 
 
@@ -112,3 +112,12 @@ $(() => {
     })
 
 })
+
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker
+        .register("/serviceWorker.js")
+        .then(res => console.log("service worker registered"))
+        .catch(err => console.log("service worker not registered", err));
+    });
+  }

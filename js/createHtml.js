@@ -1,5 +1,5 @@
 const createDataCard = (data) => {
-    console.log("Creating Card...")
+    // console.log("Creating Card...")
     /*
     {
         "topNum": "144",
@@ -9,7 +9,7 @@ const createDataCard = (data) => {
     }
     */
     let bpCategory = categorizeBloodPressure(data)
-    console.log("BP Category: " + bpCategory)
+    // console.log("BP Category: " + bpCategory)
 
     return `
         <div class="bp_data_card" ${data._id}>
