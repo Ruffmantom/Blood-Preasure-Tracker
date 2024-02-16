@@ -32,7 +32,7 @@
         </div>
       </div>
       <div class="menu_content">
-        <p class="form_lable">Download CSV</p>
+        <p class="form_lable">Export as CSV</p>
         <button id="download_csv_btn" class="btn btn_primary">
           Download
           <svg xmlns="http://www.w3.org/2000/svg"
@@ -78,12 +78,12 @@
         <div class="form ">
           <div class="form_input_row">
             <div class="form_sec">
-              <p class="form_lable">Top Num</p>
-              <input id="bp_input_systolic" type="text" placeholder="Systolic" class="form_elm">
+              <p class="form_lable">Top Number</p>
+              <input id="bp_input_systolic" type="number" max="400" placeholder="Systolic" class="form_elm">
             </div>
             <div class="form_sec">
-              <p class="form_lable">Bottom Num</p>
-              <input id="bp_input_diastolic" type="text" placeholder="Diastolic" class="form_elm">
+              <p class="form_lable">Bottom Number</p>
+              <input id="bp_input_diastolic" type="number" max="400" placeholder="Diastolic" class="form_elm">
             </div>
           </div>
           <button id="submit_bp_btn" class="btn btn_primary">Submit</button>
