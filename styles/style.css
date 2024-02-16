@@ -45,7 +45,7 @@ input {
 .bp_data_cont {
   padding-bottom: 130px;
   padding-top: 10px;
-  max-height: 80vh;
+  max-height: 60vh;
   overflow-y: scroll;
   scroll-behavior: smooth;
 }

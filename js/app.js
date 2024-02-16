@@ -99,9 +99,7 @@ $(() => {
 
     // form submit
     $("#submit_bp_btn").click(function (event) {
-        event.preventDefault(); // Prevents the default form submission action
-        // var systolicValue = $("#bp_input_systolic").val();
-        // var diastolicValue = $("#bp_input_diastolic").val();
+        event.preventDefault();
         var bothSysAndDia = $('#input_sys_and_dio').val();
         let sys = bothSysAndDia.split("/")[0]
         let dia = bothSysAndDia.split("/")[1]
@@ -121,8 +119,6 @@ $(() => {
         // save to local
         saveToLocal()
         // clean up
-        // $("#bp_input_systolic").val("")
-        // $("#bp_input_diastolic").val("")
         $('#input_sys_and_dio').val("")
     });
 
