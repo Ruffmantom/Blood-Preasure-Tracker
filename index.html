@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="./styles/clear.css">
   <link rel="stylesheet" href="./styles/ruffstyles.css">
   <link rel="stylesheet" href="./styles/style.css">
-  <link rel="manifest" href="./manifest.json">
+  <link rel="manifest" href="./utils/manifest.json">
   <!-- ios support -->
   <link rel="apple-touch-icon" href="./assets/images/mybp-app-logo.png" />
   <link rel="icon" type="image/x-icon" href="./assets/icons/mybp-app-logo-96x96.ico">
@@ -20,6 +20,24 @@
 </head>
 
 <body>
+  <div class="welcome_modal_overlay_cont">
+    <div class="welcome_modal_inner">
+      <div class="welcome_modal_header">
+        <h2>Welcome!</h2>
+        <p>Please enter your age to get started.</p>
+        
+        <div class="form">
+          <div class="form_sec">
+            <p class="form_lable">Age</p>
+            <input id="age_input" type="number" max="120" placeholder="30" class="form_elm">
+          </div>
+          <button id="submit_age_btn" class="btn btn_primary">Submit</button>
+        </div>
+      
+      </div>
+    </div>
+  </div>
+
 
   <div class="menu_overlay_cont ">
     <div class="menu_inner">

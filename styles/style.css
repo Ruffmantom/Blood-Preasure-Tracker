@@ -109,7 +109,7 @@ input {
   background-color: var(--bp-blk);
 }
 
-.menu_overlay_cont {
+.menu_overlay_cont,.welcome_modal_overlay_cont {
   position: fixed;
   top: 0;
   left: 0;
@@ -122,7 +122,7 @@ input {
 
 }
 
-.menu_inner {
+.menu_inner,.welcome_modal_inner {
   padding: 20px;
   width: 90%;
   max-width: 450px;
@@ -135,11 +135,11 @@ input {
   justify-content: space-between;
 }
 
-.menu_overlay_cont>.menu_inner {
+.menu_overlay_cont>.menu_inner, .welcome_modal_overlay_cont>.welcome_modal_inner {
   display: none;
 }
 
-.menu_overlay_cont {
+.menu_overlay_cont,.welcome_modal_overlay_cont {
   opacity: 0;
   z-index: -1;
   transition: opacity 150ms ease-out;
@@ -152,15 +152,15 @@ input {
   padding-top: 15px;
 }
 
-.menu_overlay_cont.active {
+.menu_overlay_cont.active, .welcome_modal_overlay_cont.active {
   width: 100%;
 }
 
-.menu_overlay_cont.active>.menu_inner {
+.menu_overlay_cont.active>.menu_inner, .welcome_modal_overlay_cont>.welcome_modal_inner {
   display: block;
 }
 
-.menu_overlay_cont.active {
+.menu_overlay_cont.active, .welcome_modal_overlay_cont.active {
   opacity: 1;
   z-index: 9999;
   transition: opacity 150ms ease-in;

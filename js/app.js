@@ -1,6 +1,7 @@
 let globalUser = null
 let userLoaded = false
 const defaultUser = {
+    userAge:"",
     bp_data: []
 }
 
@@ -22,7 +23,7 @@ const renderCards = () => {
         // console.log("About to render cards...")
         globalUser.bp_data.forEach(d => {
             // console.log("Data: ", d)
-            $(".bp_data_cont").prepend(createDataCard(d))
+            $(".bp_data_cont").prepend(createDataCard(d, globalUser.userAge))
         });
     } else {
         $(".bp_data_cont").append(`<p class="end_of_data_note">No data found</p>`)
@@ -51,6 +52,26 @@ const loadUserOrCreate = () => {
 $(() => {
     loadUserOrCreate()
 
+    if(userLoaded && globalUser.userAge === ""){
+        $(".welcome_modal_overlay_cont").addClass("active")
+    }
+
+    $("#submit_age_btn").click(function (event) {
+        var ageInputVal = $("#age_input").val();
+        globalUser.userAge = ageInputVal
+        // save to local
+        saveToLocal()
+        // render dom
+        renderCards()
+        // clean up
+        $("#age_input").val("")
+        // close modal
+        $(".welcome_modal_overlay_cont").fadeOut()
+        setTimeout(() => {
+            $(".welcome_modal_overlay_cont").removeClass("active")
+        }, 2000);
+    })
+
     // form submit
     $("#submit_bp_btn").click(function (event) {
         event.preventDefault(); // Prevents the default form submission action
@@ -72,8 +93,8 @@ $(() => {
         // save to local
         saveToLocal()
         // clean up
-        systolicValue.val('')
-        diastolicValue.val('')
+        $("#bp_input_systolic").val("")
+        $("#bp_input_diastolic").val("")
     });
 
 

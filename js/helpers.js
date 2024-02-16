@@ -38,34 +38,32 @@ function formatDate(isoDateString) {
     return formattedDate;
 }
 
-function categorizeBloodPressure(bpReadings) {
+function categorizeBloodPressure(bpReadings, age = 30) {
     const systolic = parseInt(bpReadings.topNum, 10);
     const diastolic = parseInt(bpReadings.bottomNum, 10);
-    let category = "Normal"; // Default to "good"
+    let category = "Normal"; // Default category
 
-    // Define thresholds
-    const lowThreshold = { systolic: 90, diastolic: 60 };
-    const highThreshold = { systolic: 120, diastolic: 80 };
-    const tooLowThreshold = { systolic: 80, diastolic: 50 }; // More extreme low
-    const tooHighThreshold = { systolic: 140, diastolic: 90 }; // More extreme high
-
-    // Check for "too low"
-    if (systolic <= tooLowThreshold.systolic || diastolic <= tooLowThreshold.diastolic) {
-        category = "Very Low";
+    // Define age-specific thresholds
+    let thresholds;
+    if (age >= 2 && age <= 13) {
+        thresholds = { low: { systolic: 80, diastolic: 40 }, high: { systolic: 120, diastolic: 80 } };
+    } else if (age >= 14 && age <= 18) {
+        thresholds = { low: { systolic: 90, diastolic: 50 }, high: { systolic: 120, diastolic: 80 } };
+    } else if (age >= 19 && age <= 40) {
+        thresholds = { low: { systolic: 95, diastolic: 60 }, high: { systolic: 135, diastolic: 80 } };
+    } else if (age >= 41 && age <= 60) {
+        thresholds = { low: { systolic: 110, diastolic: 70 }, high: { systolic: 145, diastolic: 90 } };
+    } else {
+        // Default to adult (19-40 years) if age is not provided or out of range
+        thresholds = { low: { systolic: 95, diastolic: 60 }, high: { systolic: 135, diastolic: 80 } };
     }
-    // Check for "low"
-    else if (systolic < lowThreshold.systolic || diastolic < lowThreshold.diastolic) {
+
+    // Check against thresholds
+    if (systolic < thresholds.low.systolic || diastolic < thresholds.low.diastolic) {
         category = "Low";
-    }
-    // Check for "too high"
-    else if (systolic >= tooHighThreshold.systolic || diastolic >= tooHighThreshold.diastolic) {
-        category = "Very High";
-    }
-    // Check for "high"
-    else if (systolic > highThreshold.systolic || diastolic > highThreshold.diastolic) {
+    } else if (systolic > thresholds.high.systolic || diastolic > thresholds.high.diastolic) {
         category = "High";
     }
-    // If none of the above, blood pressure is considered "good"
 
     return category;
 }

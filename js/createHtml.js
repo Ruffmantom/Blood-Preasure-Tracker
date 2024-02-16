@@ -1,4 +1,4 @@
-const createDataCard = (data) => {
+const createDataCard = (data, age) => {
     // console.log("Creating Card...")
     /*
     {
@@ -8,7 +8,7 @@ const createDataCard = (data) => {
         _id: BP-BKW8938KJ
     }
     */
-    let bpCategory = categorizeBloodPressure(data)
+    let bpCategory = categorizeBloodPressure(data, age)
     // console.log("BP Category: " + bpCategory)
 
     return `
