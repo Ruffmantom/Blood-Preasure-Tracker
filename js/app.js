@@ -1,7 +1,7 @@
 let globalUser = null
 let userLoaded = false
 const defaultUser = {
-    userAge:"",
+    userAge: "",
     bp_data: []
 }
 
@@ -52,7 +52,7 @@ const loadUserOrCreate = () => {
 $(() => {
     loadUserOrCreate()
 
-    if(userLoaded && globalUser.userAge === ""){
+    if (userLoaded && globalUser.userAge === "") {
         $(".welcome_modal_overlay_cont").addClass("active")
     }
 
@@ -72,16 +72,44 @@ $(() => {
         }, 2000);
     })
 
+
+    // new input for systolic and diastolic
+    $('#input_sys_and_dio').on('input', function(e) {
+        // Get the current cursor position
+        var cursorPos = this.selectionStart;
+        var originalLength = this.value.length;
+
+        // Remove non-digits and the separator if it's not in the correct position
+        var value = $(this).val().replace(/[^0-9]/g, '');
+        if (value.length > 3) {
+            value = value.slice(0, 3) + '/' + value.slice(3);
+        }
+
+        $(this).val(value);
+
+        // Adjust cursor position after formatting
+        var newLength = this.value.length;
+        cursorPos = cursorPos + (newLength - originalLength);
+        
+
+        this.setSelectionRange(cursorPos, cursorPos);
+    });
+
+
+
     // form submit
     $("#submit_bp_btn").click(function (event) {
         event.preventDefault(); // Prevents the default form submission action
-        var systolicValue = $("#bp_input_systolic").val();
-        var diastolicValue = $("#bp_input_diastolic").val();
+        // var systolicValue = $("#bp_input_systolic").val();
+        // var diastolicValue = $("#bp_input_diastolic").val();
+        var bothSysAndDia = $('#input_sys_and_dio').val();
+        let sys = bothSysAndDia.split("/")[0]
+        let dia = bothSysAndDia.split("/")[1]
         var recordedAt = new Date().toISOString(); // ISO string format of current date and time
 
         var bpValues = {
-            topNum: systolicValue,
-            bottomNum: diastolicValue,
+            topNum: parseInt(sys),
+            bottomNum: parseInt(dia),
             recordedAt: recordedAt,
             _id: generateBPId()
         };
@@ -93,8 +121,9 @@ $(() => {
         // save to local
         saveToLocal()
         // clean up
-        $("#bp_input_systolic").val("")
-        $("#bp_input_diastolic").val("")
+        // $("#bp_input_systolic").val("")
+        // $("#bp_input_diastolic").val("")
+        $('#input_sys_and_dio').val("")
     });
 
 
