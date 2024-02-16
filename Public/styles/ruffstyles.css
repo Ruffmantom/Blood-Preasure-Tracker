@@ -309,7 +309,7 @@
 .btn {
     padding: 10px;
     border-radius: var(--stnd-border-radius);
-    margin-top: 2rem;
+    margin-top: 1rem;
     text-decoration: none;
     text-align: center;
     cursor: pointer;
