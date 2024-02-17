@@ -3,33 +3,33 @@
     "name": "Blood Pressure",
     "icons": [
       {
-        "src": "./assets/images/mybp-app-logo.webp",
+        "src": "../assets/images/mybp-app-logo.webp",
         "sizes": "48x48",
         "type": "image/webp"
       },
       {
-        "src": "./assets/icons/mybp-app-logo-72x72.ico",
+        "src": "../assets/icons/mybp-app-logo-72x72.ico",
         "sizes": "72x72",
         "type": "image/x-icon"
       },
       {
-        "src": "./assets/icons/mybp-app-logo-96x96.ico",
+        "src": "../assets/icons/mybp-app-logo-96x96.ico",
         "sizes": "96x96",
         "type": "image/x-icon"
       },
       {
-        "src": "./assets/icons/mybp-app-logo-128x128.ico",
+        "src": "../assets/icons/mybp-app-logo-128x128.ico",
         "sizes": "128x128",
         "type": "image/x-icon"
       },
       {
-        "src": "./assets/icons/mybp-app-logo-256x256.ico",
+        "src": "../assets/icons/mybp-app-logo-256x256.ico",
         "sizes": "256x256",
         "type": "image/x-icon"
       }
     ],
     "lang": "en-US",
-    "start_url": "./index.html",
+    "start_url": "../index.html",
     "display": "standalone",  
     "background_color": "white",   
     "theme_color": "black" 
