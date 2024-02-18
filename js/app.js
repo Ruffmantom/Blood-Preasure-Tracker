@@ -121,6 +121,7 @@ $(() => {
     saveToLocal();
     // clean up
     $("#input_sys_and_dio").val("");
+    $("#note_input_elm").val("")
   });
 
   settings_btn.on("click", (e) => {
