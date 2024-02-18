@@ -342,7 +342,7 @@
     padding-bottom: 10px;
     cursor: default;
 }
-input {
+input, textarea {
     position: relative;
     border: 1px solid var(--light-primary-darker);
     border-radius: var(--stnd-border-radius);

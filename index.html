@@ -46,7 +46,10 @@
         <!-- close button -->
         <div class="close_settings_btn_cont">
           <div id="close_settings_btn"></div>
-          <img src="./assets/icons/close.png" alt="">
+          <div class="close_symbol">
+            <div class="close_elm"></div>
+            <div class="close_elm"></div>
+          </div>
         </div>
       </div>
       <div class="menu_content">
@@ -71,9 +74,14 @@
       <div class="col col_1">
         <div class="app_header">
           <h4>Daily Blood Pressure Tracker</h4>
+          
           <div class="settings_btn_cont">
             <div id="settings_btn"></div>
-            <img src="./assets/icons/settings.png" alt="">
+            <div class="menu_symbol">
+              <div class="menu_elm"></div>
+              <div class="menu_elm"></div>
+              <div class="menu_elm"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -90,7 +98,15 @@
       </div>
     </div>
   </div>
+  
   <div class="container tracker_footer">
+    <div class="btn_cont footer_close_btn_cont">
+      <div id="close_footer_btn"></div>
+      <div class="close_symbol">
+        <div class="close_elm"></div>
+        <div class="close_elm"></div>
+      </div>
+    </div>
     <div class="row">
       <div class="col col_1">
         <div class="form ">
@@ -98,9 +114,21 @@
             <p class="form_lable">Systolic (Top) / Diastolic (Bottom)</p>
             <input type="tel" class="form_elm" id="input_sys_and_dio" placeholder="120/70" pattern="\d{3}/\d{2}" />
           </div>
+          <div class="form_sec">
+            <p class="form_lable">Add Note</p>
+            <textarea type="text" class="form_elm" id="note_input_elm" placeholder="note..." ></textarea>
+          </div>
           <button id="submit_bp_btn" class="btn btn_primary">Submit</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="btn_cont footer_open_btn_cont">
+    <div id="footer_open_btn"></div>
+    <div class="plus_symbol">
+      <div class="plus_elm"></div>
+      <div class="plus_elm"></div>
     </div>
   </div>
 
