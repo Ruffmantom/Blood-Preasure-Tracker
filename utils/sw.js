@@ -1,4 +1,4 @@
-var cacheName = "bp-app-v2";
+var cacheName = "bp-app-v3";
 var filesToCache = [
   "../",
   "../index.html",

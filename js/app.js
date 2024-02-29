@@ -38,17 +38,22 @@ const loadTheme = () => {
   if (globalUser.bp_theme) {
     $("#light_mode").prop("checked", false);
     $("#dark_mode").prop("checked", true);
+    $("#theme_name").text("Dark");
   } else {
     $("#light_mode").prop("checked", true);
     $("#dark_mode").prop("checked", false);
+    $("#theme_name").text("Light");
   }
 };
 
 const renderToggle = () => {
   if (globalUser.bp_theme) {
     $(".theme_toggle_btn").addClass("dark");
+    
+    
   } else {
     $(".theme_toggle_btn").removeClass("dark");
+    
   }
 };
 
