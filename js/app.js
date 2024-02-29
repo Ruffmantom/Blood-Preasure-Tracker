@@ -2,6 +2,7 @@ let globalUser = null;
 let userLoaded = false;
 const defaultUser = {
   userAge: "",
+  bp_theme: false, // if true then is dark
   bp_data: [],
 };
 
@@ -22,12 +23,32 @@ const renderCards = () => {
   if (userLoaded && globalUser.bp_data.length >= 1) {
     // console.log("About to render cards...")
     globalUser.bp_data.forEach((d) => {
-      let dataIndex = globalUser.bp_data.indexOf(d)
-      let maxLength = globalUser.bp_data.length
-      $(".bp_data_cont").prepend(createDataCard(d, globalUser.userAge,dataIndex,maxLength));
+      let dataIndex = globalUser.bp_data.indexOf(d);
+      let maxLength = globalUser.bp_data.length;
+      $(".bp_data_cont").prepend(
+        createDataCard(d, globalUser.userAge, dataIndex, maxLength)
+      );
     });
   } else {
     $(".bp_data_cont").append(`<p class="end_of_data_note">No data found</p>`);
+  }
+};
+
+const loadTheme = () => {
+  if (globalUser.bp_theme) {
+    $("#light_mode").prop("checked", false);
+    $("#dark_mode").prop("checked", true);
+  } else {
+    $("#light_mode").prop("checked", true);
+    $("#dark_mode").prop("checked", false);
+  }
+};
+
+const renderToggle = () => {
+  if (globalUser.bp_theme) {
+    $(".theme_toggle_btn").addClass("dark");
+  } else {
+    $(".theme_toggle_btn").removeClass("dark");
   }
 };
 
@@ -43,10 +64,21 @@ const loadUserOrCreate = () => {
   } else {
     globalUser = JSON.parse(localUser);
     userLoaded = true;
+    // check for theme init
+    if (globalUser.bp_theme === undefined || globalUser.bp_theme === null) {
+      // add variable and save
+      globalUser.bp_theme = false; // default
+      //save to local
+      saveToLocal();
+    }
     // load dom
+    loadTheme();
+    renderToggle();
     renderCards();
   }
 };
+
+
 
 $(() => {
   loadUserOrCreate();
@@ -121,7 +153,7 @@ $(() => {
     saveToLocal();
     // clean up
     $("#input_sys_and_dio").val("");
-    $("#note_input_elm").val("")
+    $("#note_input_elm").val("");
   });
 
   settings_btn.on("click", (e) => {
@@ -166,5 +198,22 @@ $(() => {
   $("#footer_open_btn").on("click", function (e) {
     // console.log("open!");
     $(".tracker_footer").slideDown();
+  });
+
+  // theme toggle
+  /*
+    - checkboxes
+    #light_mode
+    #dark_mode
+
+  */
+  $(".theme_toggle_btn").on("click", (e) => {
+    // toggle theme
+    globalUser.bp_theme = !globalUser.bp_theme;
+    // render dom
+    loadTheme();
+    renderToggle();
+    // save to local
+    saveToLocal()
   });
 });

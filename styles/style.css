@@ -6,10 +6,27 @@
   --bp-blult: hsl(216, 82%, 98%);
   --bp-red: #d3424c;
   --bp-dblu: #3942ac;
+  --bp-action-bkg: #4387ec;
+}
+/* When the light is checked */
+:root:has(#light_mode:checked) {
+  --bp-color: #1f1f1f;
+  --bp-main-bkg: #fff;
+  --bp-secondary-bkg: #f6f9fe;
+}
+
+:root:has(#dark_mode:checked) {
+  --bp-color: #fff;
+  --bp-main-bkg: #212121;
+  --bp-secondary-bkg: #2c2c2c;
 }
 
 * {
-  color: var(--bp-blk);
+  color: var(--bp-color);
+}
+
+body {
+  background-color: var(--bp-main-bkg);
 }
 
 .tracker_footer {
@@ -17,7 +34,7 @@
   z-index: 99;
   bottom: 0;
   width: 100%;
-  background-color: var(--bp-blult);
+  background-color: var(--bp-secondary-bkg);
   border-radius: 10px 10px 0 0;
   padding-top: 0;
 }
@@ -28,7 +45,7 @@
 
 input,
 textarea {
-  background-color: white;
+  background-color: var(--bp-main-bkg);
   border: none;
   outline: none;
 }
@@ -55,7 +72,7 @@ textarea {
 }
 
 .bp_data_card {
-  background-color: var(--bp-blult);
+  background-color: var(--bp-secondary-bkg);
   padding: 10px;
   display: flex;
   justify-content: space-between;
@@ -99,7 +116,7 @@ textarea {
   max-width: 75%;
 }
 .bp_showcase {
-  background-color: white;
+  background-color: var(--bp-main-bkg);
   width: 75px;
   height: 75px;
   border-radius: 5px;
@@ -114,7 +131,7 @@ textarea {
   width: 60%;
   height: 2px;
   border-radius: 1pc;
-  background-color: var(--bp-blk);
+  background-color: var(--bp-color);
 }
 
 .menu_overlay_cont,
@@ -127,7 +144,7 @@ textarea {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--bp-blult);
+  background-color: var(--bp-secondary-bkg);
 }
 
 .menu_inner,
@@ -135,7 +152,7 @@ textarea {
   padding: 20px;
   width: 90%;
   max-width: 450px;
-  background-color: white;
+  background-color: var(--bp-main-bkg);
   border-radius: 10px;
 }
 
@@ -198,7 +215,7 @@ textarea {
   width: 35px;
   height: 35px;
   display: flex;
-  background-color: var(--bp-blu);
+  background-color: var(--bp-action-bkg);
   justify-content: center;
   align-items: center;
   position: relative;
@@ -212,7 +229,7 @@ textarea {
   top: 10px;
   right: 10px;
   /* right: 10px; */
-  background-color: white;
+  background-color: var(--bp-main-bkg);
 }
 
 .settings_btn_cont > img,
@@ -275,12 +292,12 @@ textarea {
   height: 75px;
   width: 75px;
   border-radius: 10pc;
-  border: 7px solid white;
+  border: 7px solid var(--bp-main-bkg);
   z-index: 9;
 }
 
 .footer_close_btn_cont {
-  background-color: var(--bp-blu);
+  background-color: var(--bp-action-bkg);
 }
 .plus_symbol,
 .close_symbol,
@@ -324,7 +341,7 @@ textarea {
 .theme_toggle_cont {
   height: 45px;
   width: 50%;
-  background-color: var(--bp-blult);
+  background-color: var(--bp-secondary-bkg);
   border-radius: 7px;
   margin-bottom: 10px;
   position: relative;
@@ -335,9 +352,9 @@ textarea {
 .theme_toggle_btn {
   position: absolute;
   height: 75%;
-  width: 50%;
+  width: 40%;
   border-radius: 3px;
-  background-color: var(--bp-blu);
+  background-color: var(--bp-action-bkg);
 }
 
 .theme_toggle_btn {
@@ -349,4 +366,9 @@ textarea {
   left: inherit;
   right: 5px;
   transition: all 150ms ease-in;
+}
+
+.theme_check_boxes {
+  position: fixed;
+  top: -500px;
 }
