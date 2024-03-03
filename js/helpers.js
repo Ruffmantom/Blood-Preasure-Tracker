@@ -94,14 +94,47 @@ function categorizeBloodPressure(bpReadings, age = 30) {
 function downloadCSV(data, filename = "data.csv") {
   // Convert array of objects into CSV data
   let csvContent = "data:text/csv;charset=utf-8,";
-  const headers = Object.keys(data[0]).join(",");
-  csvContent += headers + "\n";
-
+  // const headers = Object.keys(data[0]).join(",");
+  /*
+  
+    var bpValues = {
+      topNum: parseInt(sys),
+      bottomNum: parseInt(dia),
+      note: noteElmVal ? noteElmVal : "",
+      recordedAt: recordedAt,
+      _id: generateBPId(),
+    };
+systolic and diastolic
+  
+  */
+  let newheaders = [
+    "Systolic",
+    "Diastolic",
+    "Note",
+    "Date Recorded",
+    "Time Recorded",
+    "ID",
+  ];
+  newheaders.join(",");
+  csvContent += newheaders + "\n";
+  let formatedData = [];
   data.forEach((row) => {
     // format recordedAt
     let fDate = formatDate(row.recordedAt);
     row.recordedAt = fDate;
+    let bpObj = {
+      s: row.topNum,
+      d: row.bottomNum,
+      n: JSON.stringify(row.note),
+      date: fDate.split("@")[0].trim(),
+      time: fDate.split("@")[1].trim(),
+      id: row._id,
+    };
 
+    formatedData.push(bpObj);
+  });
+
+  formatedData.forEach((row) => {
     const rowData = Object.values(row).join(",");
     csvContent += rowData + "\n";
   });
