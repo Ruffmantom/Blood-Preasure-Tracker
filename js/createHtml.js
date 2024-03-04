@@ -8,25 +8,26 @@ const createDataCard = (data, age, index, length) => {
         _id: BP-BKW8938KJ
     }
     */
+  let today = new Date().toLocaleDateString()
+  let cardsDate = new Date(data.recordedAt).toLocaleDateString()
+
   let bpCategory = categorizeBloodPressure(data, age);
   // console.log("BP Category: " + bpCategory)
 
   return `
-        <div class="bp_data_card ${index === length-1 ? "most_recent" : ""}" ${
-    data._id
-  }>
+        <div class="bp_data_card ${cardsDate === today ? "most_recent" : ""}" ${data._id
+    }>
             
-            <p class="bp_tag ${
-              bpCategory === "Very Low"
-                ? "danger"
-                : bpCategory === "low"
-                ? "caution"
-                : bpCategory === "Very High"
-                ? "danger"
-                : bpCategory === "High"
-                ? "caution"
-                : "normal"
-            }">${bpCategory}</p>
+            <p class="bp_tag ${bpCategory === "Very Low"
+      ? "danger"
+      : bpCategory === "low"
+        ? "caution"
+        : bpCategory === "Very High"
+          ? "danger"
+          : bpCategory === "High"
+            ? "caution"
+            : "normal"
+    }">${bpCategory}</p>
 
             <div class="bp_card_info">
             <p class="bp_rec_date">${formatDate(data.recordedAt)}
