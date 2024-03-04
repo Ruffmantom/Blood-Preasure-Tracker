@@ -6,6 +6,7 @@
   --bp-blult: hsl(216, 82%, 98%);
   --bp-red: #d3424c;
   --bp-dblu: #3942ac;
+  /* --bp-dblu-bkg: #141847; */
   --bp-action-bkg: #4387ec;
 }
 /* When the light is checked */
@@ -13,12 +14,14 @@
   --bp-color: #1f1f1f;
   --bp-main-bkg: #fff;
   --bp-secondary-bkg: #f6f9fe;
+  --bp-dblu-bkg: #eff0fc;
 }
 
 :root:has(#dark_mode:checked) {
   --bp-color: #fff;
   --bp-main-bkg: #212121;
   --bp-secondary-bkg: #2c2c2c;
+  --bp-dblu-bkg: #1d1e33;
 }
 
 * {
@@ -72,7 +75,7 @@ textarea {
 }
 
 .bp_data_card {
-  background-color: var(--bp-secondary-bkg);
+background-color: var(--bp-secondary-bkg);
   padding: 10px;
   display: flex;
   justify-content: space-between;
@@ -83,6 +86,7 @@ textarea {
 }
 .bp_data_card.most_recent {
   border: 1px solid var(--bp-dblu);
+  background-color: var(--bp-dblu-bkg);
 }
 
 .bp_data_card:not(:last-child) {
@@ -116,7 +120,6 @@ textarea {
   max-width: 75%;
 }
 .bp_showcase {
-  background-color: var(--bp-main-bkg);
   width: 75px;
   height: 75px;
   border-radius: 5px;
@@ -125,6 +128,13 @@ textarea {
   align-items: center;
   justify-content: center;
   border: 1px solid var(--bp-red);
+}
+
+.bp_data_card.most_recent>.bp_showcase{
+  background-color: var(--bp-dblu-bkg);
+}
+.bp_showcase>P{
+  font-weight: bold;
 }
 
 .bp_divide_line {
