@@ -176,6 +176,7 @@ $(() => {
       menuOpen = false;
     }
   });
+  
 
   $("#download_csv_btn").on("click", (e) => {
     let date = new Date().toISOString();
@@ -221,4 +222,10 @@ $(() => {
     // save to local
     saveToLocal()
   });
+
+$(".bp_data_cont").on('click', ".bp_data_card ", (e)=>{
+  console.log(e.target)
+})
+
+
 });

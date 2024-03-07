@@ -15,7 +15,7 @@ const createDataCard = (data, age, index, length) => {
   // console.log("BP Category: " + bpCategory)
 
   return `
-        <div class="bp_data_card ${cardsDate === today ? "most_recent" : ""}" ${data._id
+        <div class="bp_data_card ${cardsDate === today ? "most_recent" : ""}" data-recordid=${data._id
     }>
             
             <p class="bp_tag ${bpCategory === "Very Low"

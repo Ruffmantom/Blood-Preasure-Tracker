@@ -143,9 +143,14 @@ background-color: var(--bp-secondary-bkg);
   border-radius: 1pc;
   background-color: var(--bp-color);
 }
-
+/* 
+overlay_cont
+overlay_inner
+overlay_inner_header
+*/
 .menu_overlay_cont,
-.welcome_modal_overlay_cont {
+.welcome_modal_overlay_cont,
+.overlay_cont {
   position: fixed;
   top: 0;
   left: 0;
@@ -158,6 +163,7 @@ background-color: var(--bp-secondary-bkg);
 }
 
 .menu_inner,
+.overlay_inner,
 .welcome_modal_inner {
   padding: 20px;
   width: 90%;
@@ -166,17 +172,20 @@ background-color: var(--bp-secondary-bkg);
   border-radius: 10px;
 }
 
-.menu_header {
+.menu_header,
+.overlay_inner_header {
   display: flex;
   justify-content: space-between;
 }
 
 .menu_overlay_cont > .menu_inner,
+.overlay_cont > .overlay_inner,
 .welcome_modal_overlay_cont > .welcome_modal_inner {
   display: none;
 }
 
 .menu_overlay_cont,
+.overlay_cont ,
 .welcome_modal_overlay_cont {
   opacity: 0;
   z-index: -1;
@@ -191,16 +200,19 @@ background-color: var(--bp-secondary-bkg);
 }
 
 .menu_overlay_cont.active,
+.overlay_cont .active,
 .welcome_modal_overlay_cont.active {
   width: 100%;
 }
 
 .menu_overlay_cont.active > .menu_inner,
+.overlay_cont.active > .overlay_inner,
 .welcome_modal_overlay_cont > .welcome_modal_inner {
   display: block;
 }
 
 .menu_overlay_cont.active,
+.overlay_cont.active,
 .welcome_modal_overlay_cont.active {
   opacity: 1;
   z-index: 9999;
