@@ -152,3 +152,53 @@ systolic and diastolic
   // Clean up
   document.body.removeChild(link);
 }
+
+const returnBpCategoryClass = (cat)=>{
+  let className = ""
+  switch (cat) {
+    case "Low":
+      className = "caution"
+      break;
+      case "High":
+      className = "danger"
+      break;
+      default:
+      className = "normal"
+      break;
+  }
+  return className
+}
+
+const clearDataModal = () => {
+  // reset
+  $("#overlay_record_index").text("")
+  $("#modal_top_num").text("")
+  $("#modal_bot_num").text("")
+  $("#overlay_note_input").val()
+  $("#overlay_record_date").text("")
+  $("#modal_bp_category").text("")
+  $("#modal_bp_category").text("")
+  $("#modal_bp_category").removeClass("danger")
+  $("#modal_bp_category").removeClass("normal")
+  $("#modal_bp_category").removeClass("caution")
+  $("#save_record_btn").attr('recordid',"")
+  $("#delete_record_btn").attr('recordid',"")
+}
+const setDataModal = (data) => {
+  clearDataModal()
+  // set elements
+  $("#overlay_record_index").text(data._id)
+  $("#modal_top_num").text(data.topNum)
+  $("#modal_bot_num").text(data.bottomNum)
+  $("#overlay_note_input").val(data.note)
+  $("#overlay_record_date").text(formatDate(data.recordedAt))
+  let category = categorizeBloodPressure(data, globalUser.userAge)
+  let categoryClass = returnBpCategoryClass(category)
+  
+  $("#modal_bp_category").text(category)
+  $("#modal_bp_category").addClass(categoryClass)
+  // set save and delete btn ids
+  $("#save_record_btn").attr('recordid',data._id)
+  $("#delete_record_btn").attr('recordid',data._id)
+
+}
