@@ -30,7 +30,7 @@ const createDataCard = (data, age, index, length) => {
             <p class="bp_rec_date">${formatDate(data.recordedAt)}
             </p>
             
-            ${data.note ? `<p class="bp_note" >"${data.note}"</p>` : ""}
+            ${data.note ? `<p class="bp_note shorten_description" >"${data.note}"</p>` : ""}
             </div>
             
             <div class="bp_showcase">
