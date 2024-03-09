@@ -156,21 +156,17 @@ systolic and diastolic
 const returnBpCategoryClass = (cat)=>{
   let className = ""
   switch (cat) {
-    case value:
-      className = ""
+    case "Low":
+      className = "caution"
       break;
-    case value:
-      className = ""
+      case "High":
+      className = "danger"
       break;
-    case value:
-      className = ""
-      break;
-    case value:
-      className = ""
-      break;
-    default:
+      default:
+      className = "normal"
       break;
   }
+  return className
 }
 
 const clearDataModal = () => {
@@ -181,6 +177,12 @@ const clearDataModal = () => {
   $("#overlay_note_input").val()
   $("#overlay_record_date").text("")
   $("#modal_bp_category").text("")
+  $("#modal_bp_category").text("")
+  $("#modal_bp_category").removeClass("danger")
+  $("#modal_bp_category").removeClass("normal")
+  $("#modal_bp_category").removeClass("caution")
+  $("#save_record_btn").attr('recordid',"")
+  $("#delete_record_btn").attr('recordid',"")
 }
 const setDataModal = (data) => {
   clearDataModal()
@@ -191,6 +193,12 @@ const setDataModal = (data) => {
   $("#overlay_note_input").val(data.note)
   $("#overlay_record_date").text(formatDate(data.recordedAt))
   let category = categorizeBloodPressure(data, globalUser.userAge)
+  let categoryClass = returnBpCategoryClass(category)
   
   $("#modal_bp_category").text(category)
+  $("#modal_bp_category").addClass(categoryClass)
+  // set save and delete btn ids
+  $("#save_record_btn").attr('recordid',data._id)
+  $("#delete_record_btn").attr('recordid',data._id)
+
 }

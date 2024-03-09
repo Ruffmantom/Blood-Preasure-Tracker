@@ -1,5 +1,7 @@
 let globalUser = null;
 let userLoaded = false;
+let activeModalDataNote = ""
+let activeModalDataId = ""
 const defaultUser = {
   userAge: "",
   bp_theme: false, // if true then is dark
@@ -16,12 +18,12 @@ const saveToLocal = () => {
 };
 
 const renderCards = () => {
-  // console.log("Render Cards has started...")
+  // // console.log("Render Cards has started...")
   // when re rendering be sure to empty div
   $(".bp_data_cont").empty();
 
   if (userLoaded && globalUser.bp_data.length >= 1) {
-    // console.log("About to render cards...")
+    // // console.log("About to render cards...")
     globalUser.bp_data.forEach((d) => {
       let dataIndex = globalUser.bp_data.indexOf(d);
       let maxLength = globalUser.bp_data.length;
@@ -62,7 +64,7 @@ const loadUserOrCreate = () => {
   // check local storage, if no user then create
   let localUser = localStorage.getItem("BP_TR_USER");
   if (localUser === null || localUser === undefined) {
-    // console.log('lets create a new user!')
+    // // console.log('lets create a new user!')
     localStorage.setItem("BP_TR_USER", JSON.stringify(defaultUser));
     globalUser = defaultUser;
     userLoaded = true;
@@ -85,7 +87,47 @@ const loadUserOrCreate = () => {
 
 const handleRecordModal = (recordId) => {
   let data = globalUser.bp_data.filter(d => d._id === recordId)
+  // set state
+  activeModalDataNote = data[0].note
+  activeModalDataId = data[0]._id
   setDataModal(data[0])
+}
+const handleDeleteRecord = () => {
+  globalUser.bp_data = globalUser.bp_data.filter(d => d._id !== activeModalDataId)
+  // close modal
+  $("#record_modal").removeClass("active")
+  // render cards
+  renderCards()
+  // save to local
+  saveToLocal()
+  // clear state
+  activeModalDataNote = ""
+  activeModalDataId = ""
+}
+
+const handleSaveRecord = (newNote) => {
+  // console.log("New Note: " + newNote)
+  // only thing you can change is the note
+  globalUser.bp_data.forEach(d => {
+    // find data
+    if (d._id === activeModalDataId) {
+      // console.log("found Data")
+      // check to see if user has edited the note
+      if (newNote !== '' && newNote !== d.note) {
+        // console.log("updating note")
+        d.note = newNote
+        // render cards
+        renderCards()
+        // save to local
+        saveToLocal()
+      }
+    }
+  })
+  // close modal
+  $("#record_modal").removeClass("active")
+  // clear state
+  activeModalDataNote = ""
+  activeModalDataId = ""
 }
 
 
@@ -200,13 +242,13 @@ $(() => {
   // footer actions
   // close footer
   $("#close_footer_btn").on("click", function (e) {
-    // console.log("Close!");
+    // // console.log("Close!");
     $(".tracker_footer").slideUp();
   });
 
   // open footer
   $("#footer_open_btn").on("click", function (e) {
-    // console.log("open!");
+    // // console.log("open!");
     $(".tracker_footer").slideDown();
   });
 
@@ -227,6 +269,7 @@ $(() => {
     saveToLocal()
   });
 
+
   $(".bp_data_cont").on('click', ".bp_data_card ", (e) => {
     let cardId = $(e.target).data("recordid")
     $("#record_modal").addClass("active")
@@ -235,10 +278,22 @@ $(() => {
   })
 
   $("#close_record_modal_btn").on('click', (e) => {
+    // clear state
+    activeModalDataNote = ""
+    activeModalDataId = ""
     // close modal
     $("#record_modal").removeClass("active")
     // cleanup
     clearDataModal()
+  })
+
+  $("#save_record_btn").on("click", (e) => {
+    let noteVal = $("#overlay_note_input").val()
+    handleSaveRecord(noteVal)
+  })
+
+  $("#delete_record_btn").on("click", (e) => {
+    handleDeleteRecord()
   })
 
 });

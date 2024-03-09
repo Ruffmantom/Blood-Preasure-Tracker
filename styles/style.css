@@ -444,6 +444,6 @@ overlay_inner_header
 #modal_bp_category{
   padding: 5px 12px;
   border-radius: 7px;
-  background-color: var(--bp-action-bkg);
   color: white;
 }
+

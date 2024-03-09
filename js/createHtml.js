@@ -19,12 +19,10 @@ const createDataCard = (data, age, index, length) => {
             <div class="bp_card_btn" data-recordid=${data._id}></div>
             <p class="bp_tag ${bpCategory === "Very Low"
       ? "danger"
-      : bpCategory === "low"
+      : bpCategory === "Low"
         ? "caution"
-        : bpCategory === "Very High"
-          ? "danger"
-          : bpCategory === "High"
-            ? "caution"
+        : bpCategory === "High"
+            ? "danger"
             : "normal"
     }">${bpCategory}</p>
 
