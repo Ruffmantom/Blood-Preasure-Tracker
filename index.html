@@ -49,7 +49,7 @@
     <div id="record_modal" class="overlay_cont">
       <div class="overlay_inner">
         <div class="overlay_inner_header">
-          <h2>Record: <span id="overlay_record_index"></span></h2>
+          <h3>Record: <span id="overlay_record_index"></span></h3>
           <!-- close button -->
           <div class="close_settings_btn_cont">
             <div id="close_record_modal_btn"></div>
@@ -59,12 +59,22 @@
             </div>
           </div>
         </div>
+        <div class="record_modal_showcase">
 
+          <div class="bp_showcase">
+            <p id="modal_top_num"></p>
+            <div class="bp_divide_line"></div>
+            <p id="modal_bot_num"></p>
+          </div>
+          <p id="modal_bp_category"></p>
+
+        </div>
+        <p class="mt_1">Recorded at:</p>
         <p id="overlay_record_date"></p>
         <div class="form">
           <div class="form_sec">
             <p class="form_lable">Note</p>
-            <textarea id="overlay_note_input" class="form_elm"></textarea>
+            <textarea id="overlay_note_input" rows="4" placeholder="Add a note..." class="form_elm"></textarea>
           </div>
           <button id="save_record_btn" class="btn btn_primary">Save</button>
           <button id="delete_record_btn" class="btn btn_primary">Delete</button>

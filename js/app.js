@@ -49,11 +49,11 @@ const loadTheme = () => {
 const renderToggle = () => {
   if (globalUser.bp_theme) {
     $(".theme_toggle_btn").addClass("dark");
-    
-    
+
+
   } else {
     $(".theme_toggle_btn").removeClass("dark");
-    
+
   }
 };
 
@@ -83,6 +83,10 @@ const loadUserOrCreate = () => {
   }
 };
 
+const handleRecordModal = (recordId) => {
+  let data = globalUser.bp_data.filter(d => d._id === recordId)
+  setDataModal(data[0])
+}
 
 
 $(() => {
@@ -176,7 +180,7 @@ $(() => {
       menuOpen = false;
     }
   });
-  
+
 
   $("#download_csv_btn").on("click", (e) => {
     let date = new Date().toISOString();
@@ -223,9 +227,18 @@ $(() => {
     saveToLocal()
   });
 
-$(".bp_data_cont").on('click', ".bp_data_card ", (e)=>{
-  console.log(e.target)
-})
+  $(".bp_data_cont").on('click', ".bp_data_card ", (e) => {
+    let cardId = $(e.target).data("recordid")
+    $("#record_modal").addClass("active")
+    // set modal
+    handleRecordModal(cardId)
+  })
 
+  $("#close_record_modal_btn").on('click', (e) => {
+    // close modal
+    $("#record_modal").removeClass("active")
+    // cleanup
+    clearDataModal()
+  })
 
 });

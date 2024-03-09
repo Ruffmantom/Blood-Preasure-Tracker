@@ -152,3 +152,45 @@ systolic and diastolic
   // Clean up
   document.body.removeChild(link);
 }
+
+const returnBpCategoryClass = (cat)=>{
+  let className = ""
+  switch (cat) {
+    case value:
+      className = ""
+      break;
+    case value:
+      className = ""
+      break;
+    case value:
+      className = ""
+      break;
+    case value:
+      className = ""
+      break;
+    default:
+      break;
+  }
+}
+
+const clearDataModal = () => {
+  // reset
+  $("#overlay_record_index").text("")
+  $("#modal_top_num").text("")
+  $("#modal_bot_num").text("")
+  $("#overlay_note_input").val()
+  $("#overlay_record_date").text("")
+  $("#modal_bp_category").text("")
+}
+const setDataModal = (data) => {
+  clearDataModal()
+  // set elements
+  $("#overlay_record_index").text(data._id)
+  $("#modal_top_num").text(data.topNum)
+  $("#modal_bot_num").text(data.bottomNum)
+  $("#overlay_note_input").val(data.note)
+  $("#overlay_record_date").text(formatDate(data.recordedAt))
+  let category = categorizeBloodPressure(data, globalUser.userAge)
+  
+  $("#modal_bp_category").text(category)
+}
