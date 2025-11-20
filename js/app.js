@@ -229,7 +229,7 @@ $(() => {
     let dateName = formatDate(date);
     let formattedName = dateName.split(" ")[0].replace(/\//g, "-");
     if (globalUser.bp_data.length >= 1) {
-      downloadCSV(globalUser.bp_data, `BP-${formattedName}.csv`);
+      dounloadTxt(globalUser.bp_data, `BP-${formattedName}.txt`);
     }
   });
 

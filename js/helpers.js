@@ -91,78 +91,45 @@ function categorizeBloodPressure(bpReadings, age = 30) {
   return category;
 }
 
-function downloadCSV(data, filename = "data.csv") {
-  // Convert array of objects into CSV data
-  let csvContent = "data:text/csv;charset=utf-8,";
-  // const headers = Object.keys(data[0]).join(",");
-  /*
-  
-    var bpValues = {
-      topNum: parseInt(sys),
-      bottomNum: parseInt(dia),
-      note: noteElmVal ? noteElmVal : "",
-      recordedAt: recordedAt,
-      _id: generateBPId(),
-    };
-systolic and diastolic
-  
-  */
-  let newheaders = [
-    "Systolic",
-    "Diastolic",
-    "Note",
-    "Date Recorded",
-    "Time Recorded",
-    "ID",
-  ];
-  newheaders.join(",");
-  csvContent += newheaders + "\n";
-  let formatedData = [];
+function dounloadTxt(data, filename = "data.txt") {
+  if (!Array.isArray(data)) data = [];
+
+  // Build the text content using the stringData format
+  let stringData = "";
   data.forEach((row) => {
-    // format recordedAt
-    let fDate = formatDate(row.recordedAt);
-    row.recordedAt = fDate;
-    let bpObj = {
-      s: row.topNum,
-      d: row.bottomNum,
-      n: JSON.stringify(row.note),
-      date: fDate.split("@")[0].trim(),
-      time: fDate.split("@")[1].trim(),
-      id: row._id,
-    };
-
-    formatedData.push(bpObj);
+    const note = row.note ? String(row.note).replace(/\r?\n/g, " ") : "";
+    stringData += `• ${formatDate(row.recordedAt)} - (${row.topNum}/${row.bottomNum}) "${note}"\n`;
   });
 
-  formatedData.forEach((row) => {
-    const rowData = Object.values(row).join(",");
-    csvContent += rowData + "\n";
-  });
+  // Create a plain-text blob and trigger download
+  const blob = new Blob([stringData], { type: "text/plain;charset=utf-8" });
 
-  // Create a link to download the CSV file
-  const encodedUri = encodeURI(csvContent);
+  // IE fallback
+  if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+    window.navigator.msSaveOrOpenBlob(blob, filename);
+    return;
+  }
+
+  const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
-  link.setAttribute("download", filename);
-  document.body.appendChild(link); // Required for FF
-
-  // Trigger the download
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
   link.click();
-
-  // Clean up
   document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }
 
-const returnBpCategoryClass = (cat)=>{
+const returnBpCategoryClass = (cat) => {
   let className = ""
   switch (cat) {
     case "Low":
       className = "caution"
       break;
-      case "High":
+    case "High":
       className = "danger"
       break;
-      default:
+    default:
       className = "normal"
       break;
   }
@@ -181,8 +148,8 @@ const clearDataModal = () => {
   $("#modal_bp_category").removeClass("danger")
   $("#modal_bp_category").removeClass("normal")
   $("#modal_bp_category").removeClass("caution")
-  $("#save_record_btn").attr('recordid',"")
-  $("#delete_record_btn").attr('recordid',"")
+  $("#save_record_btn").attr('recordid', "")
+  $("#delete_record_btn").attr('recordid', "")
 }
 const setDataModal = (data) => {
   clearDataModal()
@@ -194,11 +161,11 @@ const setDataModal = (data) => {
   $("#overlay_record_date").text(formatDate(data.recordedAt))
   let category = categorizeBloodPressure(data, globalUser.userAge)
   let categoryClass = returnBpCategoryClass(category)
-  
+
   $("#modal_bp_category").text(category)
   $("#modal_bp_category").addClass(categoryClass)
   // set save and delete btn ids
-  $("#save_record_btn").attr('recordid',data._id)
-  $("#delete_record_btn").attr('recordid',data._id)
+  $("#save_record_btn").attr('recordid', data._id)
+  $("#delete_record_btn").attr('recordid', data._id)
 
 }

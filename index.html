@@ -60,24 +60,35 @@
           </div>
         </div>
         <div class="record_modal_showcase">
-
           <div class="bp_showcase">
             <p id="modal_top_num"></p>
             <div class="bp_divide_line"></div>
             <p id="modal_bot_num"></p>
           </div>
           <p id="modal_bp_category"></p>
-
         </div>
         <p class="mt_1">Recorded at:</p>
         <p id="overlay_record_date"></p>
         <div class="form">
           <div class="form_sec">
             <p class="form_lable">Note</p>
-            <textarea id="overlay_note_input" rows="4" placeholder="Add a note..." class="form_elm"></textarea>
+            <textarea
+              id="overlay_note_input"
+              rows="4"
+              placeholder="Add a note..."
+              class="form_elm"
+            ></textarea>
           </div>
-          <button id="save_record_btn" data-recordid="" class="btn btn_primary">Save</button>
-          <button id="delete_record_btn" data-recordid="" class="btn btn_primary">Delete</button>
+          <button id="save_record_btn" data-recordid="" class="btn btn_primary">
+            Save
+          </button>
+          <button
+            id="delete_record_btn"
+            data-recordid=""
+            class="btn btn_primary"
+          >
+            Delete
+          </button>
         </div>
       </div>
     </div>
@@ -102,11 +113,10 @@
           <div class="theme_toggle_cont">
             <div class="theme_toggle_btn"></div>
           </div>
-          <p class="form_lable">Export as CSV</p>
+          <p class="form_lable">Export as Text File</p>
           <button id="download_csv_btn" class="btn btn_primary">
             Download
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
-              <!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
               <path
                 d="M0 64C0 28.7 28.7 0 64 0H224V128c0 17.7 14.3 32 32 32H384V288H216c-13.3 0-24 10.7-24 24s10.7 24 24 24H384V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V64zM384 336V288H494.1l-39-39c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l80 80c9.4 9.4 9.4 24.6 0 33.9l-80 80c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l39-39H384zm0-208H256V0L384 128z"
               />
@@ -114,7 +124,7 @@
           </button>
           <p class="form_lable">Clear all data</p>
           <button id="clear_all_data_btn" class="btn btn_primary">Clear</button>
-          <p class="version">App Version: 1.2.1</p>
+          <p class="version">App Version: 1.2.2</p>
         </div>
       </div>
     </div>
@@ -169,7 +179,6 @@
             <div class="form_sec">
               <p class="form_lable">Add Note</p>
               <textarea
-                type="text"
                 class="form_elm"
                 id="note_input_elm"
                 placeholder="note..."
