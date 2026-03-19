@@ -2,6 +2,8 @@ let globalUser = null;
 let userLoaded = false;
 let activeModalDataNote = ""
 let activeModalDataId = ""
+// pages are bloodPressure, cabinet, settings
+let currentPage = 'bloodPressure'
 const defaultUser = {
   userAge: "",
   bp_theme: false, // if true then is dark
@@ -295,5 +297,86 @@ $(() => {
   $("#delete_record_btn").on("click", (e) => {
     handleDeleteRecord()
   })
+
+  // elements
+  const $modalOverlay = $("#overlay")
+  const $addBpEntryModal = $("#add-bp-entry-modal")
+
+  // buttons
+  const $footerAddBtn = $("#footer-add-btn")
+  const $closeAddEntryBtn = $("#close-add-entry-btn")
+  const $footerBpTrackerBtn = $('#footer-bp-tracker-btn')
+  const $footerCabinetBtn = $('#footer-cabinet-btn')
+  const $footerSettingsBtn = $('#footer-settings-btn')
+
+  // hide elements
+  $addBpEntryModal.hide()
+  $modalOverlay.hide()
+
+  // actions
+  $footerAddBtn.click(() => {
+    if (currentPage === 'bloodPressure') {
+      $modalOverlay.fadeIn()
+      $addBpEntryModal.slideDown()
+    } else {
+      console.log(`Opening modal for page: ${currentPage}`)
+    }
+  })
+
+  $closeAddEntryBtn.click(() => {
+    $modalOverlay.fadeOut()
+    $addBpEntryModal.slideUp()
+  })
+
+
+  const setPage = (title, pageId) => {
+    headerTitle.textContent = title
+    if (pageId === 'bloodPressure') {
+      $footerBpTrackerBtn.removeClass('border-zinc-50/0 fill-zinc-950')
+      $footerBpTrackerBtn.addClass('border-blue-600 fill-blue-600')
+
+      $footerCabinetBtn.addClass('border-zinc-50/0 fill-zinc-950')
+      $footerCabinetBtn.removeClass('border-blue-600 fill-blue-600')
+
+      $footerSettingsBtn.addClass('border-zinc-50/0 fill-zinc-950')
+      $footerSettingsBtn.removeClass('border-blue-600 fill-blue-600')
+    } else if (pageId === 'cabinet') {
+      $footerCabinetBtn.removeClass('border-zinc-50/0 fill-zinc-950')
+      $footerCabinetBtn.addClass('border-blue-600 fill-blue-600')
+
+      $footerBpTrackerBtn.addClass('border-zinc-50/0 fill-zinc-950')
+      $footerBpTrackerBtn.removeClass('border-blue-600 fill-blue-600')
+
+      $footerSettingsBtn.addClass('border-zinc-50/0 fill-zinc-950')
+      $footerSettingsBtn.removeClass('border-blue-600 fill-blue-600')
+    } else if (pageId === 'settings') {
+      $footerSettingsBtn.removeClass('border-zinc-50/0 fill-zinc-950')
+      $footerSettingsBtn.addClass('border-blue-600 fill-blue-600')
+
+      $footerCabinetBtn.addClass('border-zinc-50/0 fill-zinc-950')
+      $footerCabinetBtn.removeClass('border-blue-600 fill-blue-600')
+
+      $footerBpTrackerBtn.addClass('border-zinc-50/0 fill-zinc-950')
+      $footerBpTrackerBtn.removeClass('border-blue-600 fill-blue-600')
+    } else {
+      return
+    }
+  }
+
+  $footerBpTrackerBtn.click(function () {
+    currentPage = 'bloodPressure'
+    setPage('Blood Pressure tracker', currentPage)
+  })
+
+  $footerCabinetBtn.click(function () {
+    currentPage = 'cabinet'
+    setPage('Cabinet', currentPage)
+  })
+
+  $footerSettingsBtn.click(function () {
+    currentPage = 'settings'
+    setPage('Settings', currentPage)
+  })
+
 
 });
