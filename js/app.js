@@ -1,44 +1,42 @@
+let appVersion = "2.0.0";
 let globalUser = null;
 let userLoaded = false;
 let activeModalDataNote = ""
 let activeModalDataId = ""
+let currentBloodPressureCardId = ''
+const localUserId = 'O1LHQAMLTTIUVI2USHPGZOKKAJOVU4PCCBKF26Q7ZRNNHK496PPOV9THXRRGXEKH7T6M8WDXNKYLIDSWHQFMMSPWHCRLBPJKJ4YM'
 // pages are bloodPressure, cabinet, settings
 let currentPage = 'bloodPressure'
 const defaultUser = {
   userAge: "",
+  userBirthday: "",
   bp_theme: false, // if true then is dark
+  bp_theme_title: "Light", // if true then is dark
   bp_data: [],
+  userStatus: "setup"
 };
 
-const menu_overlay_cont = $(".menu_overlay_cont");
-const settings_btn = $("#settings_btn");
-const close_settings_btn = $("#close_settings_btn");
-let menuOpen = false;
-
 const saveToLocal = () => {
-  localStorage.setItem("BP_TR_USER", JSON.stringify(globalUser));
+  localStorage.setItem(localUserId, JSON.stringify(globalUser));
 };
 
 const renderCards = () => {
-  // // console.log("Render Cards has started...")
-  // when re rendering be sure to empty div
-  $(".bp_data_cont").empty();
-
+  bloodPressureTrackerSection.empty()
   if (userLoaded && globalUser.bp_data.length >= 1) {
-    // // console.log("About to render cards...")
     globalUser.bp_data.forEach((d) => {
-      let dataIndex = globalUser.bp_data.indexOf(d);
-      let maxLength = globalUser.bp_data.length;
-      $(".bp_data_cont").prepend(
-        createDataCard(d, globalUser.userAge, dataIndex, maxLength)
-      );
-    });
+      let element = bloodPressureCardComponent(d)
+      bloodPressureTrackerSection.prepend(element)
+    })
   } else {
-    $(".bp_data_cont").append(`<p class="end_of_data_note">No data found</p>`);
+    bloodPressureTrackerSection.append(`<p class="text-center">No data found</p>
+      <p class="text-center">You have not added any entries yet</p>`)
   }
+
 };
 
 const loadTheme = () => {
+  // set settings text
+  settingsThemeText.text(globalUser.bp_theme_title)
   if (globalUser.bp_theme) {
     $("#light_mode").prop("checked", false);
     $("#dark_mode").prop("checked", true);
@@ -64,77 +62,154 @@ const renderToggle = () => {
 // load program
 const loadUserOrCreate = () => {
   // check local storage, if no user then create
-  let localUser = localStorage.getItem("BP_TR_USER");
+  let localUser = localStorage.getItem(localUserId);
   if (localUser === null || localUser === undefined) {
-    // // console.log('lets create a new user!')
-    localStorage.setItem("BP_TR_USER", JSON.stringify(defaultUser));
+    console.log('lets create a new user!')
+    // load in welcome modal
+    welcomeOverlay.show()
+    localStorage.setItem(localUserId, JSON.stringify(defaultUser));
     globalUser = defaultUser;
     userLoaded = true;
   } else {
-    globalUser = JSON.parse(localUser);
-    userLoaded = true;
-    // check for theme init
-    if (globalUser.bp_theme === undefined || globalUser.bp_theme === null) {
-      // add variable and save
-      globalUser.bp_theme = false; // default
-      //save to local
-      saveToLocal();
+    let parsedUser = JSON.parse(localUser)
+    if (parsedUser.userStatus === 'setup') {
+      globalUser = parsedUser
+      userLoaded = true;
+      // load in welcome modal to finish setup
+      welcomeOverlay.show()
+      return
+    } else {
+      globalUser = parsedUser
+      userLoaded = true;
+      // check for theme init
+      if (globalUser.bp_theme === undefined || globalUser.bp_theme === null) {
+        // add variable and save
+        globalUser.bp_theme = false; // default
+        //save to local
+        saveToLocal();
+      }
+      // load dom
+      loadTheme();
+      renderToggle();
+      renderCards();
     }
-    // load dom
-    loadTheme();
-    renderToggle();
-    renderCards();
   }
 };
 
-const handleRecordModal = (recordId) => {
-  let data = globalUser.bp_data.filter(d => d._id === recordId)
-  // set state
-  activeModalDataNote = data[0].note
-  activeModalDataId = data[0]._id
-  setDataModal(data[0])
+const handleSetup = () => {
+  let birthday = userBirthdayInput.val()
+  console.log(birthday)
 }
+
+userBirthdayInput.on('input', function () {
+  let birthday = $(this).val()
+  userYearsOld.text(`Your age: ${getAgeFromDateInput(birthday)}`)
+})
+
+welcomeGetStartedBtn.on('click', function (e) {
+  e.preventDefault()
+  console.log(globalUser)
+  let birthday = userBirthdayInput.val()
+  if (!birthday) {
+    addAppAlert('danger', "Please input your birthday to help get accurate feedback.")
+    return
+  }
+
+  // set user birthday and age
+  globalUser.userAge = getAgeFromDateInput(birthday)
+  globalUser.userBirthday = birthday
+  globalUser.userStatus = 'ready'
+  // save user
+  saveToLocal()
+  // close the welcome modal
+  welcomeOverlay.fadeOut(() => {
+    userBirthdayInput.val('')
+  })
+
+})
+
 const handleDeleteRecord = () => {
-  globalUser.bp_data = globalUser.bp_data.filter(d => d._id !== activeModalDataId)
-  // close modal
-  $("#record_modal").removeClass("active")
+  if (!currentBloodPressureCardId) {
+    addAppAlert('danger', 'There was an issue deleting this entry. Please reload the app and try again.')
+    return
+  }
+  globalUser.bp_data = globalUser.bp_data.filter(d => d.id !== currentBloodPressureCardId)
   // render cards
   renderCards()
   // save to local
   saveToLocal()
+  // clear inputs
+  editBloodPressureInput.val('')
+  editBloodPressurePulseInput.val('')
+  editBloodPressureNotesInput.val('')
   // clear state
-  activeModalDataNote = ""
-  activeModalDataId = ""
+  currentBloodPressureCardId = ""
+  // close edit modal
+  modalOverlay.fadeOut()
+  editBpEntryModal.slideUp()
 }
 
-const handleSaveRecord = (newNote) => {
-  // console.log("New Note: " + newNote)
-  // only thing you can change is the note
+const handleSaveRecord = (data) => {
   globalUser.bp_data.forEach(d => {
     // find data
-    if (d._id === activeModalDataId) {
+    if (d.id === currentBloodPressureCardId) {
       // console.log("found Data")
       // check to see if user has edited the note
-      if (newNote !== '' && newNote !== d.note) {
-        // console.log("updating note")
-        d.note = newNote
-        // render cards
-        renderCards()
-        // save to local
-        saveToLocal()
-      }
+      d.systolic = data.systolic
+      d.diastolic = data.diastolic
+      d.pulse = data.pulse
+      d.notes = data.notes
     }
   })
-  // close modal
-  $("#record_modal").removeClass("active")
+  // save to local
+  saveToLocal()
+  // render cards
+  renderCards()
+
+  // clear inputs
+  editBloodPressureInput.val('')
+  editBloodPressurePulseInput.val('')
+  editBloodPressureNotesInput.val('')
   // clear state
-  activeModalDataNote = ""
-  activeModalDataId = ""
+  currentBloodPressureCardId = ""
+  // close edit modal
+  modalOverlay.fadeOut()
+  editBpEntryModal.slideUp()
 }
+
+const addAppAlert = (type, text) => {
+  const notifyId = generateBPId()
+  const notification = $(notificationComponent(type, text, notifyId))
+
+  notificationContainer.prepend(notification)
+
+  setTimeout(() => {
+    notification.fadeOut(400, () => {
+      notification.remove()
+    })
+  }, 3000)
+}
+
+
+// handle loading Blood pressure edit form
+const loadEditBloodPressureForm = (cardId) => {
+  let foundCard = globalUser.bp_data.find(d => d.id === cardId)
+
+  if (!foundCard) {
+    addAppAlert('danger', 'There was an error loading this card please reload the app.')
+    return
+  }
+  editBloodPressureInput.val(`${foundCard.systolic}/${foundCard.diastolic}`)
+  editBloodPressurePulseInput.val(foundCard.pulse)
+  editBloodPressureNotesInput.val(foundCard.notes)
+}
+
 
 
 $(() => {
   loadUserOrCreate();
+  // set version
+  versionTextElm.text(appVersion)
   // onload hide footer
   $(".tracker_footer").hide();
 
@@ -158,71 +233,41 @@ $(() => {
     }, 2000);
   });
 
+
   // new input for systolic and diastolic
-  $("#input_sys_and_dio").on("input", function (e) {
-    // Get the current cursor position
-    var cursorPos = this.selectionStart;
-    var originalLength = this.value.length;
-
-    // Remove non-digits and the separator if it's not in the correct position
-    var value = $(this)
-      .val()
-      .replace(/[^0-9]/g, "");
-    if (value.length > 3) {
-      value = value.slice(0, 3) + "/" + value.slice(3);
-    }
-
-    $(this).val(value);
-
-    // Adjust cursor position after formatting
-    var newLength = this.value.length;
-    cursorPos = cursorPos + (newLength - originalLength);
-
-    this.setSelectionRange(cursorPos, cursorPos);
-  });
+  // formats the value inside of these inputs
+  addBloodPressureInput.on("input", handleSysAndDiaFormat);
+  editBloodPressureInput.on("input", handleSysAndDiaFormat);
 
   // form submit
-  $("#submit_bp_btn").click(function (event) {
+  addBloodPressureBtn.click(function (event) {
     event.preventDefault();
-    var bothSysAndDia = $("#input_sys_and_dio").val();
-    var noteElmVal = $("#note_input_elm").val();
+    var bothSysAndDia = addBloodPressureInput.val();
+    var pulseElmVal = addBloodPressurePulseInput.val();
+    var noteElmVal = addBloodPressureNotesInput.val();
     let sys = bothSysAndDia.split("/")[0];
     let dia = bothSysAndDia.split("/")[1];
-    var recordedAt = new Date().toISOString(); // ISO string format of current date and time
-
-    var bpValues = {
-      topNum: parseInt(sys),
-      bottomNum: parseInt(dia),
-      note: noteElmVal ? noteElmVal : "",
-      recordedAt: recordedAt,
-      _id: generateBPId(),
-    };
+    let newBpEntry = new BloodPressureEntry(
+      parseInt(sys),
+      parseInt(dia),
+      parseInt(pulseElmVal),
+      noteElmVal,
+      globalUser.age
+    )
 
     // save to globaluser
-    globalUser.bp_data.push(bpValues);
+    globalUser.bp_data.push(newBpEntry);
     // re render list
     renderCards();
     // save to local
     saveToLocal();
     // clean up
-    $("#input_sys_and_dio").val("");
-    $("#note_input_elm").val("");
-  });
-
-  settings_btn.on("click", (e) => {
-    if (menuOpen) {
-      menu_overlay_cont.removeClass("active");
-      menuOpen = false;
-    } else {
-      menu_overlay_cont.addClass("active");
-      menuOpen = true;
-    }
-  });
-  close_settings_btn.on("click", (e) => {
-    if (menuOpen) {
-      menu_overlay_cont.removeClass("active");
-      menuOpen = false;
-    }
+    addBloodPressureInput.val("");
+    addBloodPressurePulseInput.val("");
+    addBloodPressureNotesInput.val("");
+    // hide modal
+    modalOverlay.fadeOut()
+    addBpEntryModal.slideUp()
   });
 
 
@@ -239,19 +284,6 @@ $(() => {
     localStorage.clear("BP_TR_USER");
     // Reload the page from the server, ignoring the cache
     window.location.reload(true);
-  });
-
-  // footer actions
-  // close footer
-  $("#close_footer_btn").on("click", function (e) {
-    // // console.log("Close!");
-    $(".tracker_footer").slideUp();
-  });
-
-  // open footer
-  $("#footer_open_btn").on("click", function (e) {
-    // // console.log("open!");
-    $(".tracker_footer").slideDown();
   });
 
   // theme toggle
@@ -272,111 +304,135 @@ $(() => {
   });
 
 
-  $(".bp_data_cont").on('click', ".bp_data_card ", (e) => {
-    let cardId = $(e.target).data("recordid")
-    $("#record_modal").addClass("active")
-    // set modal
-    handleRecordModal(cardId)
+  editBloodPressureSaveBtn.on("click", (e) => {
+    var bothSysAndDia = editBloodPressureInput.val();
+    var pulseElmVal = editBloodPressurePulseInput.val();
+    var noteElmVal = editBloodPressureNotesInput.val();
+    let sys = bothSysAndDia.split("/")[0];
+    let dia = bothSysAndDia.split("/")[1];
+    let editFormData = {
+      systolic: sys,
+      diastolic: dia,
+      pulse: pulseElmVal,
+      notes: noteElmVal,
+    }
+
+    handleSaveRecord(editFormData)
   })
 
-  $("#close_record_modal_btn").on('click', (e) => {
-    // clear state
-    activeModalDataNote = ""
-    activeModalDataId = ""
-    // close modal
-    $("#record_modal").removeClass("active")
-    // cleanup
-    clearDataModal()
-  })
-
-  $("#save_record_btn").on("click", (e) => {
-    let noteVal = $("#overlay_note_input").val()
-    handleSaveRecord(noteVal)
-  })
-
-  $("#delete_record_btn").on("click", (e) => {
+  editBloodPressureDeleteBtn.on("click", (e) => {
     handleDeleteRecord()
   })
 
-  // elements
-  const $modalOverlay = $("#overlay")
-  const $addBpEntryModal = $("#add-bp-entry-modal")
-
-  // buttons
-  const $footerAddBtn = $("#footer-add-btn")
-  const $closeAddEntryBtn = $("#close-add-entry-btn")
-  const $footerBpTrackerBtn = $('#footer-bp-tracker-btn')
-  const $footerCabinetBtn = $('#footer-cabinet-btn')
-  const $footerSettingsBtn = $('#footer-settings-btn')
-
-  // hide elements
-  $addBpEntryModal.hide()
-  $modalOverlay.hide()
 
   // actions
-  $footerAddBtn.click(() => {
+  footerAddBtn.click(() => {
     if (currentPage === 'bloodPressure') {
-      $modalOverlay.fadeIn()
-      $addBpEntryModal.slideDown()
+      modalOverlay.fadeIn()
+      addBpEntryModal.slideDown()
     } else {
       console.log(`Opening modal for page: ${currentPage}`)
     }
   })
 
-  $closeAddEntryBtn.click(() => {
-    $modalOverlay.fadeOut()
-    $addBpEntryModal.slideUp()
+  closeAddEntryBtn.click(() => {
+    modalOverlay.fadeOut()
+    addBpEntryModal.slideUp()
+  })
+
+  closeEditEntryBtn.click(() => {
+    modalOverlay.fadeOut()
+    editBpEntryModal.slideUp()
   })
 
 
+  // set and load page
   const setPage = (title, pageId) => {
-    headerTitle.textContent = title
+    headerTitle.text(title)
     if (pageId === 'bloodPressure') {
-      $footerBpTrackerBtn.removeClass('border-zinc-50/0 fill-zinc-950')
-      $footerBpTrackerBtn.addClass('border-blue-600 fill-blue-600')
+      // footer
+      footerTop.show()
 
-      $footerCabinetBtn.addClass('border-zinc-50/0 fill-zinc-950')
-      $footerCabinetBtn.removeClass('border-blue-600 fill-blue-600')
+      // show section
+      bloodPressureTrackerSection.show()
+      cabinetSection.hide()
+      settingsSection.hide()
 
-      $footerSettingsBtn.addClass('border-zinc-50/0 fill-zinc-950')
-      $footerSettingsBtn.removeClass('border-blue-600 fill-blue-600')
+      // add and remove classes
+      footerBpTrackerBtn.removeClass('border-zinc-50/0 fill-zinc-950 dark:fill-zinc-50')
+      footerBpTrackerBtn.addClass('border-blue-600 fill-blue-600')
+
+      footerCabinetBtn.addClass('border-zinc-50/0 fill-zinc-950 dark:fill-zinc-50')
+      footerCabinetBtn.removeClass('border-blue-600 fill-blue-600')
+
+      footerSettingsBtn.addClass('border-zinc-50/0 fill-zinc-950 dark:fill-zinc-50')
+      footerSettingsBtn.removeClass('border-blue-600 fill-blue-600')
     } else if (pageId === 'cabinet') {
-      $footerCabinetBtn.removeClass('border-zinc-50/0 fill-zinc-950')
-      $footerCabinetBtn.addClass('border-blue-600 fill-blue-600')
+      // footer
+      footerTop.show()
 
-      $footerBpTrackerBtn.addClass('border-zinc-50/0 fill-zinc-950')
-      $footerBpTrackerBtn.removeClass('border-blue-600 fill-blue-600')
+      // show section
+      cabinetSection.show()
+      bloodPressureTrackerSection.hide()
+      settingsSection.hide()
 
-      $footerSettingsBtn.addClass('border-zinc-50/0 fill-zinc-950')
-      $footerSettingsBtn.removeClass('border-blue-600 fill-blue-600')
+      // add and remove classes
+      footerCabinetBtn.removeClass('border-zinc-50/0 fill-zinc-950 dark:fill-zinc-50')
+      footerCabinetBtn.addClass('border-blue-600 fill-blue-600')
+
+      footerBpTrackerBtn.addClass('border-zinc-50/0 fill-zinc-950 dark:fill-zinc-50')
+      footerBpTrackerBtn.removeClass('border-blue-600 fill-blue-600')
+
+      footerSettingsBtn.addClass('border-zinc-50/0 fill-zinc-950 dark:fill-zinc-50')
+      footerSettingsBtn.removeClass('border-blue-600 fill-blue-600')
     } else if (pageId === 'settings') {
-      $footerSettingsBtn.removeClass('border-zinc-50/0 fill-zinc-950')
-      $footerSettingsBtn.addClass('border-blue-600 fill-blue-600')
+      // footer
+      footerTop.hide()
 
-      $footerCabinetBtn.addClass('border-zinc-50/0 fill-zinc-950')
-      $footerCabinetBtn.removeClass('border-blue-600 fill-blue-600')
+      // show section
+      bloodPressureTrackerSection.hide()
+      cabinetSection.hide()
+      settingsSection.show()
 
-      $footerBpTrackerBtn.addClass('border-zinc-50/0 fill-zinc-950')
-      $footerBpTrackerBtn.removeClass('border-blue-600 fill-blue-600')
+      // add and remove classes
+      footerSettingsBtn.removeClass('border-zinc-50/0 fill-zinc-950 dark:fill-zinc-50')
+      footerSettingsBtn.addClass('border-blue-600 fill-blue-600')
+
+      footerCabinetBtn.addClass('border-zinc-50/0 fill-zinc-950 dark:fill-zinc-50')
+      footerCabinetBtn.removeClass('border-blue-600 fill-blue-600')
+
+      footerBpTrackerBtn.addClass('border-zinc-50/0 fill-zinc-950 dark:fill-zinc-50')
+      footerBpTrackerBtn.removeClass('border-blue-600 fill-blue-600')
     } else {
       return
     }
   }
 
-  $footerBpTrackerBtn.click(function () {
+
+  footerBpTrackerBtn.click(function () {
     currentPage = 'bloodPressure'
     setPage('Blood Pressure tracker', currentPage)
   })
 
-  $footerCabinetBtn.click(function () {
+  footerCabinetBtn.click(function () {
     currentPage = 'cabinet'
     setPage('Cabinet', currentPage)
   })
 
-  $footerSettingsBtn.click(function () {
+  footerSettingsBtn.click(function () {
     currentPage = 'settings'
     setPage('Settings', currentPage)
   })
 
+
+  // open edit blood pressure entry
+  bloodPressureTrackerSection.on('click', ".blood-pressure-card-btn", function (e) {
+    let cardId = $(this).data().cardid
+    // open edit modal
+    loadEditBloodPressureForm(cardId)
+    currentBloodPressureCardId = cardId
+    modalOverlay.fadeIn()
+    editBpEntryModal.slideDown()
+  })
 
 });

@@ -10,7 +10,25 @@
     font-style: normal;
 }
 
-
 * {
     font-family: "Poppins", sans-serif;
+}
+
+#loading-overlay-logo svg{
+    width: 100%;
+}
+
+.text-digital{
+    font-family: 'Digital', monospace;
+}
+
+.truncate-2-lines {
+    /* Required properties for multi-line truncation */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2; /* Limits the text to 2 lines */
+    overflow: hidden;
+
+    /* Optional: Fallback for older/non-compliant browsers */
+    text-overflow: ellipsis; 
 }

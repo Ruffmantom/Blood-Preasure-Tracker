@@ -1,7 +1,6 @@
 function generateBPId() {
-  var prefix = "BP-";
   var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  var idLength = 8; // Length after "BP-" prefix
+  var idLength = 10;
   var randomId = "";
 
   for (var i = 0; i < idLength; i++) {
@@ -9,7 +8,35 @@ function generateBPId() {
     randomId += chars[randomIndex];
   }
 
-  return prefix + randomId;
+  return randomId;
+}
+
+const returnIsoString = () => {
+  const now = new Date();
+  const isoTime = now.toISOString();
+  return isoTime
+}
+
+const handleSysAndDiaFormat = function () {
+  // Get the current cursor position
+  var cursorPos = this.selectionStart;
+  var originalLength = this.value.length;
+
+  // Remove non-digits and the separator if it's not in the correct position
+  var value = $(this)
+    .val()
+    .replace(/[^0-9]/g, "");
+  if (value.length > 3) {
+    value = value.slice(0, 3) + "/" + value.slice(3);
+  }
+
+  $(this).val(value);
+
+  // Adjust cursor position after formatting
+  var newLength = this.value.length;
+  cursorPos = cursorPos + (newLength - originalLength);
+
+  this.setSelectionRange(cursorPos, cursorPos);
 }
 
 function formatDate(isoDateString) {
@@ -26,23 +53,21 @@ function formatDate(isoDateString) {
   const minute = pad(date.getMinutes());
 
   // Determine AM or PM suffix
-  const ampm = hour >= 12 ? "PM" : "AM";
+  const ampm = hour >= 12 ? "pm" : "am";
 
   // Convert hour to 12-hour format
   hour = hour % 12;
   hour = hour ? hour : 12; // the hour '0' should be '12'
 
   // Construct formatted date string
-  const formattedDate = `${month}/${day}/${year} @ ${pad(
+  const formattedDate = `${month}/${day}/${year} : ${pad(
     hour
   )}:${minute} ${ampm}`;
 
   return formattedDate;
 }
 
-function categorizeBloodPressure(bpReadings, age = 30) {
-  const systolic = parseInt(bpReadings.topNum, 10);
-  const diastolic = parseInt(bpReadings.bottomNum, 10);
+function categorizeBloodPressure(systolic, diastolic, age = 30) {
   let category = "Normal"; // Default category
 
   // Define age-specific thresholds
@@ -168,4 +193,25 @@ const setDataModal = (data) => {
   $("#save_record_btn").attr('recordid', data._id)
   $("#delete_record_btn").attr('recordid', data._id)
 
+}
+
+function getAgeFromDateInput(dateValue) {
+  if (!dateValue) return null
+
+  const birthDate = new Date(dateValue)
+  if (Number.isNaN(birthDate.getTime())) return null
+
+  const today = new Date()
+  let age = today.getFullYear() - birthDate.getFullYear()
+
+  const hasHadBirthdayThisYear =
+    today.getMonth() > birthDate.getMonth() ||
+    (today.getMonth() === birthDate.getMonth() &&
+      today.getDate() >= birthDate.getDate())
+
+  if (!hasHadBirthdayThisYear) {
+    age--
+  }
+
+  return age
 }
