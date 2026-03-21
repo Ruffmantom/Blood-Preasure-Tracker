@@ -44,7 +44,7 @@
 
   <!-- welcome overlay -->
   <div id="welcome-overlay" style="display: none;"
-    class="flex flex-col absolute z-20 top-0 left-0 gap-3 h-full w-full bg-white p-4 dark:bg-zinc-950 dark:text-zinc-50 justify-center items-center">
+    class="flex flex-col absolute z-20 top-0 left-0 gap-3 h-full w-full bg-white p-4 dark:bg-zinc-900 dark:text-zinc-50 justify-center items-center">
     <div class="flex flex-col">
       <div class="w-full mb-4">
         <div id="welcome-logo" class="p-4 max-w-[150px] m-auto">
@@ -56,18 +56,19 @@
         <div class="flex flex-col gap-1 w-full">
           <label for="user-birthday">Add Birthday </label>
           <p id="user-years-old" class="text-xs"></p>
-          <input class="p-3 bg-zinc-100 dark:bg-zinc-800 rounded-sm outline-none" type="date" id="user-birthday" name="user-birthday">
+          <input class="p-3 bg-zinc-100 dark:bg-zinc-800 rounded-sm outline-none" type="date" id="user-birthday"
+            name="user-birthday">
         </div>
         <button class="p-3 bg-blue-600 text-white w-full text-center rounded-sm" id="welcome-get-started-btn">Get
           Started</button>
-        </div>
+      </div>
     </div>
   </div>
 
 
   <!-- Add Entry Modal -->
   <div id="add-bp-entry-modal" style="display: none;"
-    class="pb-12 flex flex-col absolute z-20 w-full bottom-0 left-0 gap-3 p-3 rounded-t-md bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-50">
+    class="pb-12 flex flex-col absolute z-20 w-full bottom-0 left-0 gap-3 p-3 rounded-t-md bg-zinc-50 dark:bg-zinc-900 dark:text-zinc-50">
     <div class="flex justify-between items-center">
       <p>Add Entry</p>
       <button id="close-add-entry-btn" class="close-btn dark:fill-zinc-50 p-3 rounded-sm">
@@ -95,7 +96,7 @@
 
   <!-- Edit Entry Modal -->
   <div id="edit-bp-entry-modal" style="display: none;"
-    class="pb-12 flex flex-col absolute z-20 w-full bottom-0 left-0 gap-3 p-3 rounded-t-md bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-50">
+    class="pb-12 flex flex-col absolute z-20 w-full bottom-0 left-0 gap-3 p-3 rounded-t-md bg-zinc-50 dark:bg-zinc-900 dark:text-zinc-50">
     <div class="flex justify-between items-center">
       <p>Edit Entry</p>
       <button id="close-edit-entry-btn" class="close-btn dark:fill-zinc-50 p-3 rounded-sm">
@@ -124,6 +125,73 @@
       class="p-3 bg-red-500 text-white w-full text-center rounded-sm">Delete</button>
   </div>
 
+  <!-- Add cabinet item Modal -->
+  <div id="edit-bp-entry-modal" 
+    class="pb-12 flex flex-col absolute z-20 w-full bottom-0 left-0 gap-3 p-3 rounded-t-md bg-zinc-50 dark:bg-zinc-900 dark:text-zinc-50">
+    <div class="flex justify-between items-center">
+      <p>Add Cabinet Item</p>
+      <button id="close-add-cabinet-item-btn" class="close-btn dark:fill-zinc-50 p-3 rounded-sm">
+      </button>
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="add-cabinet-type-input">Type</label>
+        <select name="add-cabinet-type-input" id="add-cabinet-type-input" class="p-3 bg-zinc-100 dark:bg-zinc-800 rounded-sm outline-none">
+          <option value="Medication" selected>Medication</option>
+          <option value="Supplement">Supplement</option>
+        </select>
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="add-cabinet-name-input">Name</label>
+      <input class="p-3 bg-zinc-100 dark:bg-zinc-800 rounded-sm outline-none" type="text"
+        id="add-cabinet-name-input" name="add-cabinet-name-input" placeholder="name...">
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="add-cabinet-strength-input">Strength</label>
+      <input class="p-3 bg-zinc-100 dark:bg-zinc-800 rounded-sm outline-none" type="text"
+        id="add-cabinet-strength-input" name="add-cabinet-strength-input" placeholder="500mg">
+    </div>
+
+    <div class="flex">
+
+      <div class="flex flex-col gap-1">
+        <label for="add-cabinet-amount-input">Amount</label>
+        <input class="p-3 bg-zinc-100 dark:bg-zinc-800 rounded-sm outline-none" type="text"
+        id="add-cabinet-amount-input" name="add-cabinet-amount-input" placeholder="1">
+      </div>
+      <div class="flex flex-col gap-1">
+        <label for="add-cabinet-frequency-input">Frequency</label>
+        <input class="p-3 bg-zinc-100 dark:bg-zinc-800 rounded-sm outline-none" type="text"
+        id="add-cabinet-frequency-input" name="add-cabinet-frequency-input" placeholder="1">
+      </div>
+      <div class="flex flex-col gap-1">
+        <label for="add-cabinet-schedule-input">Schedule</label>
+         <select name="add-cabinet-schedule-input" id="add-cabinet-schedule-input" class="p-3 bg-zinc-100 dark:bg-zinc-800 rounded-sm outline-none">
+          <option value="Daily">Daily</option>
+          <option value="Twice daily">Twice daily</option>
+          <option value="Three times daily">Three times daily</option>
+          <option value="Every morning">Every morning</option>
+          <option value="Every evening">Every evening</option>
+          <option value="Morning and evening">Morning and evening</option>
+          <option value="At bedtime">At bedtime</option>
+          <option value="Every 6 hours">Every 6 hours</option>
+          <option value="Every 8 hours">Every 8 hours</option>
+          <option value="Every 12 hours">Every 12 hours</option>
+          <option value="Weekly">Weekly</option>
+          <option value="As needed">As needed</option>
+        </select>
+      </div>
+
+    </div>
+
+    
+
+    <button id="edit-blood-pressure-save-btn"
+      class="p-3 bg-blue-600 text-white w-full text-center rounded-sm">Add Item</button>
+  </div>
+
 
 
 
@@ -145,11 +213,6 @@
     <div style="display: none;" id="cabinet-section" class="">
       <p class="text-center">No data found</p>
       <p class="text-center">You have not added any cabinet items yet</p>
-
-<!-- test cabinet card -->
-      
-
-
     </div>
     <!-- settings section -->
     <div style="display: none;" id="settings-section" class="">

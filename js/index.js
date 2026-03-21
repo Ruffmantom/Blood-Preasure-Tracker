@@ -16,6 +16,7 @@ const editBloodPressureInput = $("#edit-blood-pressure-input")
 const editBloodPressurePulseInput = $("#edit-blood-pressure-pulse-input")
 const editBloodPressureNotesInput = $("#edit-blood-pressure-notes-input")
 const userBirthdayInput = $("#user-birthday")
+
 // sections
 const bloodPressureTrackerSection = $("#blood-pressure-tracker-section")
 const cabinetSection = $("#cabinet-section")
@@ -28,6 +29,7 @@ const addBpEntryModal = $("#add-bp-entry-modal")
 const editBpEntryModal = $("#edit-bp-entry-modal")
 const notificationContainer = $("#notification-container")
 const welcomeOverlay = $("#welcome-overlay")
+
 // buttons
 const footerBpTrackerBtn = $('#footer-bp-tracker-btn')
 const footerCabinetBtn = $('#footer-cabinet-btn')
@@ -40,6 +42,8 @@ const bloodPressureCardBtn = $(".blood-pressure-card-btn")
 const editBloodPressureSaveBtn = $("#edit-blood-pressure-save-btn")
 const editBloodPressureDeleteBtn = $("#edit-blood-pressure-delete-btn")
 const welcomeGetStartedBtn = $('#welcome-get-started-btn')
+const closeBtns = $(".close-btn")
+
 // classes
 class BloodPressureEntry {
     constructor(
@@ -67,6 +71,7 @@ class CabinetItem {
     constructor(
         type = "Medication",
         name = "",
+        strength = "",
         amount = 1,
         frequency = 1,
         schedule = "Daily",
@@ -79,6 +84,7 @@ class CabinetItem {
         this.id = generateBPId()
         this.type = type
         this.name = name
+        this.strength = strength
         this.amount = amount
         this.frequency = frequency
         this.schedule = schedule
@@ -98,7 +104,7 @@ class CabinetItem {
 
 
 // set all close btns
-const closeBtns = $(".close-btn")
+
 let closeBtnsArr = Array.from(closeBtns)
 
 // set icons
