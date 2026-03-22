@@ -215,3 +215,71 @@ function getAgeFromDateInput(dateValue) {
 
   return age
 }
+
+function checkLinkIsValid(linkToTest) {
+  if (typeof linkToTest !== 'string') return false;
+
+  const link = linkToTest.trim();
+  if (!link) return false;
+
+  // Reject whitespace inside the URL
+  if (/\s/.test(link)) return false;
+
+  // Reject obvious non-external / unsafe schemes
+  if (/^(javascript|data|vbscript|file|blob):/i.test(link)) return false;
+
+  let url;
+  try {
+    url = new URL(link);
+  } catch {
+    return false;
+  }
+
+  // Only allow absolute external http/https links
+  if (!['http:', 'https:'].includes(url.protocol)) return false;
+
+  // Must have a real hostname
+  if (!url.hostname) return false;
+
+  // Block localhost
+  if (
+    url.hostname === 'localhost' ||
+    url.hostname === '127.0.0.1' ||
+    url.hostname === '::1'
+  ) {
+    return false;
+  }
+
+  // Block private/internal IPv4 ranges
+  if (isPrivateIPv4(url.hostname)) return false;
+
+  // Optional: require a dot in non-IP hostnames so "http://intranet" fails
+  if (!isIPv4(url.hostname) && !url.hostname.includes('.')) return false;
+
+  return true;
+}
+
+function isIPv4(hostname) {
+  const parts = hostname.split('.');
+  if (parts.length !== 4) return false;
+
+  return parts.every(part => {
+    if (!/^\d+$/.test(part)) return false;
+    const n = Number(part);
+    return n >= 0 && n <= 255;
+  });
+}
+
+function isPrivateIPv4(hostname) {
+  if (!isIPv4(hostname)) return false;
+
+  const [a, b] = hostname.split('.').map(Number);
+
+  return (
+    a === 10 ||
+    a === 127 ||
+    (a === 169 && b === 254) ||
+    (a === 172 && b >= 16 && b <= 31) ||
+    (a === 192 && b === 168)
+  );
+}

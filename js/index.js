@@ -7,6 +7,7 @@ const loadingOverlayText = $("#loading-overlay-text")
 const settingsThemeText = $("#settings-theme-text")
 const versionTextElm = $("#version")
 const userYearsOld = $("#user-years-old")
+const settingsUsersAge = $("#settings-users-age")
 
 // inputs
 const addBloodPressureInput = $("#add-blood-pressure-input")
@@ -16,6 +17,20 @@ const editBloodPressureInput = $("#edit-blood-pressure-input")
 const editBloodPressurePulseInput = $("#edit-blood-pressure-pulse-input")
 const editBloodPressureNotesInput = $("#edit-blood-pressure-notes-input")
 const userBirthdayInput = $("#user-birthday")
+
+const addCabinetTypeInput = $('#add-cabinet-type-input')
+const addCabinetNameInput = $('#add-cabinet-name-input')
+const addCabinetStrengthInput = $('#add-cabinet-strength-input')
+const addCabinetAmountInput = $('#add-cabinet-amount-input')
+const addCabinetFrequencyInput = $('#add-cabinet-frequency-input')
+const addCabinetScheduleInput = $('#add-cabinet-schedule-input')
+const addCabinetNotesInput = $('#add-cabinet-notes-input')
+const addCabinetQtyInput = $('#add-cabinet-qty-input')
+const addCabinetNotifyInput = $('#add-cabinet-notify-input')
+const addCabinetRefillLinkInput = $('#add-cabinet-refill-link-input')
+const addCabinetPharmacyInput = $('#add-cabinet-pharmacy-input')
+
+const updateUserBirthdayInput = $('#update-user-birthday-input')
 
 // sections
 const bloodPressureTrackerSection = $("#blood-pressure-tracker-section")
@@ -29,6 +44,8 @@ const addBpEntryModal = $("#add-bp-entry-modal")
 const editBpEntryModal = $("#edit-bp-entry-modal")
 const notificationContainer = $("#notification-container")
 const welcomeOverlay = $("#welcome-overlay")
+const addCabinetItemModal = $("#add-cabinet-item-modal")
+const changeAgeModal = $('#change-age-modal')
 
 // buttons
 const footerBpTrackerBtn = $('#footer-bp-tracker-btn')
@@ -43,6 +60,15 @@ const editBloodPressureSaveBtn = $("#edit-blood-pressure-save-btn")
 const editBloodPressureDeleteBtn = $("#edit-blood-pressure-delete-btn")
 const welcomeGetStartedBtn = $('#welcome-get-started-btn')
 const closeBtns = $(".close-btn")
+const closeAddCabinetItemBtn = $("#close-add-cabinet-item-btn")
+const closeChangeAgeModalBtn = $('#close-change-age-modal-btn')
+const updateUserBirthdayBtn = $('#update-user-birthday-btn')
+const openUpdateUserBirthdayBtn = $('#open-update-user-birthday-btn')
+const themeToggleHandlerBtn = $('#theme-toggle-handler-btn')
+const addCabinetItemBtn = $('#add-cabinet-item-btn')
+
+// const copyBloodPreasureDataBtn = $('#')
+// const clearAllDataBtn = $('#')
 
 // classes
 class BloodPressureEntry {

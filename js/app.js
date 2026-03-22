@@ -13,6 +13,7 @@ const defaultUser = {
   bp_theme: false, // if true then is dark
   bp_theme_title: "Light", // if true then is dark
   bp_data: [],
+  cabinet_data: [],
   userStatus: "setup"
 };
 
@@ -30,6 +31,20 @@ const renderCards = () => {
   } else {
     bloodPressureTrackerSection.append(`<p class="text-center">No data found</p>
       <p class="text-center">You have not added any entries yet</p>`)
+  }
+
+};
+
+const renderCabinetCards = () => {
+  cabinetSection.empty()
+  if (userLoaded && globalUser.cabinet_data.length >= 1) {
+    globalUser.cabinet_data.forEach((d) => {
+      let element = cabinetItemComponent(d)
+      cabinetSection.prepend(element)
+    })
+  } else {
+    cabinetSection.append(`<p class="text-center">No data found</p>
+      <p class="text-center">You have not added any cabinet items yet</p>`)
   }
 
 };
@@ -75,12 +90,15 @@ const loadUserOrCreate = () => {
     if (parsedUser.userStatus === 'setup') {
       globalUser = parsedUser
       userLoaded = true;
+
       // load in welcome modal to finish setup
       welcomeOverlay.show()
       return
     } else {
       globalUser = parsedUser
       userLoaded = true;
+      // set settings
+      settingsUsersAge.text(parsedUser.userAge)
       // check for theme init
       if (globalUser.bp_theme === undefined || globalUser.bp_theme === null) {
         // add variable and save
@@ -92,6 +110,7 @@ const loadUserOrCreate = () => {
       loadTheme();
       renderToggle();
       renderCards();
+      renderCabinetCards();
     }
   }
 };
@@ -105,6 +124,7 @@ userBirthdayInput.on('input', function () {
   let birthday = $(this).val()
   userYearsOld.text(`Your age: ${getAgeFromDateInput(birthday)}`)
 })
+
 
 welcomeGetStartedBtn.on('click', function (e) {
   e.preventDefault()
@@ -332,6 +352,8 @@ $(() => {
       addBpEntryModal.slideDown()
     } else {
       console.log(`Opening modal for page: ${currentPage}`)
+      modalOverlay.fadeIn()
+      addCabinetItemModal.slideDown()
     }
   })
 
@@ -345,6 +367,23 @@ $(() => {
     editBpEntryModal.slideUp()
   })
 
+  closeAddCabinetItemBtn.click(() => {
+    modalOverlay.fadeOut()
+    addCabinetItemModal.slideUp()
+  })
+
+  closeChangeAgeModalBtn.click(() => {
+    modalOverlay.fadeOut()
+    changeAgeModal.slideUp()
+  })
+
+  openUpdateUserBirthdayBtn.click((e) => {
+    e.preventDefault()
+    modalOverlay.fadeIn()
+    changeAgeModal.slideDown()
+    // set value of birthday
+    updateUserBirthdayInput.val(globalUser.userBirthday)
+  })
 
   // set and load page
   const setPage = (title, pageId) => {
@@ -433,6 +472,69 @@ $(() => {
     currentBloodPressureCardId = cardId
     modalOverlay.fadeIn()
     editBpEntryModal.slideDown()
+  })
+
+
+  // update users birthday
+  updateUserBirthdayBtn.click(function (e) {
+    e.preventDefault()
+    let newBirthday = updateUserBirthdayInput.val()
+    if (newBirthday === globalUser.userBirthday) {
+      return
+    }
+    // update
+    globalUser.userAge = getAgeFromDateInput(newBirthday)
+    globalUser.userBirthday = newBirthday
+    // save
+    saveToLocal()
+    // update setting text
+    settingsUsersAge.text(globalUser.userAge)
+    // close modal
+    modalOverlay.fadeOut()
+    changeAgeModal.slideUp()
+  })
+
+
+  // add cabinet item
+  addCabinetItemBtn.click(function (e) {
+    e.preventDefault()
+    let medType = addCabinetTypeInput.val()
+    let medName = addCabinetNameInput.val()
+    let medStrength = addCabinetStrengthInput.val()
+    let medAmount = addCabinetAmountInput.val()
+    let medFreq = addCabinetFrequencyInput.val()
+    let medSched = addCabinetScheduleInput.val()
+    let medNotes = addCabinetNotesInput.val()
+    let medQty = addCabinetQtyInput.val()
+    let medNotify = addCabinetNotifyInput.is(':checked')
+    let medRefillLink = addCabinetRefillLinkInput.val()
+    let medPharmacy = addCabinetPharmacyInput.val()
+
+    if (!medName) {
+      addAppAlert('danger', 'Please enter a name before adding a cabinet item.')
+      return
+    }
+
+    // check if link is valid
+    if (medRefillLink) {
+      let isLinkValid = checkLinkIsValid(medRefillLink)
+      if (!isLinkValid) {
+        addAppAlert('danger', 'Please enter a valid refill link.')
+        return
+      }
+    }
+
+    let newCabinetItem = new CabinetItem(medType, medName, medStrength, medAmount, medFreq, medSched, medNotes, medQty, medNotify, medRefillLink, medPharmacy)
+
+    // add item
+    globalUser.cabinet_data.push(newCabinetItem)
+    // save
+    saveToLocal()
+    // render cards
+    renderCabinetCards()
+    // close modals
+    modalOverlay.fadeOut()
+    addCabinetItemModal.slideUp()
   })
 
 });
