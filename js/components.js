@@ -92,21 +92,21 @@ const cabinetItemComponent = (data) => {
   return `
     <div class="relative flex flex-col gap-2 p-3 rounded-md bg-zinc-50 border-1 border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-50">
       <div class="relative flex flex-col gap-2">
-      <div data-cardid="${data.id}" class="cabinet-item-card-btn absolute top-0 left-0 w-full h-full"></div>
-      <div class="flex justify-between">
-        <div class="flex gap-2 items-center dark:fill-zinc-50 fill-zinc-950">
-            ${data.type === "Supplement" ? leaf() : pill()}
-            <p class="text-xs">${data.type}</p>
+        <div data-cardid="${data.id}" class="cabinet-item-card-btn absolute top-0 left-0 w-full h-full"></div>
+        <div class="flex justify-between">
+          <div class="flex gap-2 items-center dark:fill-zinc-50 fill-zinc-950">
+              ${data.type === "Supplement" ? leaf() : pill()}
+              <p class="text-xs">${data.type}</p>
+          </div>
+          ${data.notifyUser ? `<p class="text-xs text-green-600">Refill reminder</p>` : ""}
         </div>
-        ${data.notifyUser ? `<p class="text-xs text-green-600">Refill reminder</p>` : ""}
+        <p class="text-xl font-bold">${data.name} - ${data.strength}</p>
+        <p class="text-sm">${data.daysWorth} days remaining</p>
+        <p class="text-sm">Take ${data.amount} - ${data.frequency} time ${data.schedule}</p>
+        ${data.notes ? `<p class="text-sm">"${data.notes}"</p>` : ""}
+        ${data.pharmacy ? `<p class="text-sm">Pharmacy: ${data.pharmacy}</p>` : ""}
       </div>
-      <p class="text-xl font-bold">${data.name} - ${data.strength}</p>
-      <p class="text-sm">${data.daysWorth} days remaining</p>
-      <p class="text-sm">${data.amount} - ${data.frequency} time ${data.schedule}</p>
-      ${data.notes ? `<p class="text-sm">"${data.notes}"</p>` : ""}
-      ${data.pharmacy ? `<p class="text-sm">${data.pharmacy}</p>` : ""}
-</div>
-      ${data.refillLink ? `<a href="${data.refillLink}" id="edit-blood-pressure-save-btn" class="p-3 bg-zinc-200 dark:bg-zinc-800 text-white w-full text-center rounded-sm">Refill</a>` : ""}
+      ${data.refillLink ? `<a href="${data.refillLink}" target="_blank" id="edit-blood-pressure-save-btn" class="p-3 bg-zinc-200 dark:bg-zinc-800 text-white w-full text-center rounded-sm">Refill</a>` : ""}
     </div>
   
   `

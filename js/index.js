@@ -8,6 +8,7 @@ const settingsThemeText = $("#settings-theme-text")
 const versionTextElm = $("#version")
 const userYearsOld = $("#user-years-old")
 const settingsUsersAge = $("#settings-users-age")
+const addEditCabinetFormTitle = $("#add-edit-cabinet-form-title")
 
 // inputs
 const addBloodPressureInput = $("#add-blood-pressure-input")
@@ -56,6 +57,7 @@ const closeAddEntryBtn = $('#close-add-entry-btn')
 const closeEditEntryBtn = $('#close-edit-entry-btn')
 const addBloodPressureBtn = $('#add-blood-pressure-btn')
 const bloodPressureCardBtn = $(".blood-pressure-card-btn")
+const cabinetItemCardBtn = $(".cabinet-item-card-btn")
 const editBloodPressureSaveBtn = $("#edit-blood-pressure-save-btn")
 const editBloodPressureDeleteBtn = $("#edit-blood-pressure-delete-btn")
 const welcomeGetStartedBtn = $('#welcome-get-started-btn')
@@ -64,11 +66,16 @@ const closeAddCabinetItemBtn = $("#close-add-cabinet-item-btn")
 const closeChangeAgeModalBtn = $('#close-change-age-modal-btn')
 const updateUserBirthdayBtn = $('#update-user-birthday-btn')
 const openUpdateUserBirthdayBtn = $('#open-update-user-birthday-btn')
-const themeToggleHandlerBtn = $('#theme-toggle-handler-btn')
 const addCabinetItemBtn = $('#add-cabinet-item-btn')
 
-// const copyBloodPreasureDataBtn = $('#')
-// const clearAllDataBtn = $('#')
+// toggle
+const themeToggleHandlerBtn = $('#theme-toggle-handler-btn')
+const parentToggle = $('#parent-toggle')
+const innerToggle = $('#inner-toggle')
+
+//settings btns
+const copyBloodPressureDataBtn = $('#copy-blood-pressure-data-btn')
+const clearAllDataBtn = $('#clear-all-data-btn')
 
 // classes
 class BloodPressureEntry {
