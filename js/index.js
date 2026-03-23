@@ -1,5 +1,5 @@
 // variables
-let appVersion = "2.0.3";
+let appVersion = "2.0.4";
 const localUserId = 'O1LHQAMLTTIUVI2USHPGZOKKAJOVU4PCCBKF26Q7ZRNNHK496PPOV9THXRRGXEKH7T6M8WDXNKYLIDSWHQFMMSPWHCRLBPJKJ4YM'
 // pages are bloodPressure, cabinet, settings
 let currentPage = 'bloodPressure'
@@ -79,6 +79,7 @@ const notificationContainer = $("#notification-container")
 const welcomeOverlay = $("#welcome-overlay")
 const addCabinetItemModal = $("#add-cabinet-item-modal")
 const changeAgeModal = $('#change-age-modal')
+const confirmClearDataModal = $("#confirm-clear-data-modal")
 
 // buttons
 const footerBpTrackerBtn = $('#footer-bp-tracker-btn')
@@ -100,6 +101,8 @@ const updateUserBirthdayBtn = $('#update-user-birthday-btn')
 const openUpdateUserBirthdayBtn = $('#open-update-user-birthday-btn')
 const addCabinetItemBtn = $('#add-cabinet-item-btn')
 const deleteCabinetItemBtn = $('#delete-cabinet-item-btn')
+const closeConfirmClearBtn = $("#close-confirm-clear-btn")
+const confirmClearAllDataBtn = $("#confirm-clear-all-data-btn")
 
 // toggle
 const themeToggleHandlerBtn = $('#theme-toggle-handler-btn')
@@ -113,9 +116,9 @@ const clearAllDataBtn = $('#clear-all-data-btn')
 // classes
 class BloodPressureEntry {
     constructor(
-        systolic = "",
-        diastolic = "",
-        pulse = "",
+        systolic = 0,
+        diastolic = 0,
+        pulse = 0,
         notes = "",
         age = 30
     ) {

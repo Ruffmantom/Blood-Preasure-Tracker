@@ -6,6 +6,7 @@ const saveToLocal = () => {
 const renderCards = () => {
   bloodPressureTrackerSection.empty()
   if (userLoaded && globalUser.bp_data.length >= 1) {
+    let sortedCards = globalUser.bp_data.sort((a, b) => a.createdAt - b.createdAt)
     globalUser.bp_data.forEach((d) => {
       let element = bloodPressureCardComponent(d)
       bloodPressureTrackerSection.prepend(element)
@@ -213,12 +214,28 @@ const handleSaveRecord = (data) => {
   globalUser.bp_data.forEach(d => {
     // find data
     if (d.id === currentBloodPressureCardId) {
-      // check to see if user has edited the note
+      // update record
       d.systolic = data.systolic
       d.diastolic = data.diastolic
       d.pulse = data.pulse
       d.notes = data.notes
+      d.updatedAt = returnIsoString()
     }
+  })
+
+  // save
+  saveToLocal()
+  // render dom
+  renderCards()
+  // close edit modal
+  modalOverlay.fadeOut()
+  editBpEntryModal.slideUp(() => {
+    // clear state
+    currentBloodPressureCardId = ''
+    // clear inputs
+    editBloodPressureInput.val('')
+    editBloodPressurePulseInput.val('')
+    editBloodPressureNotesInput.val('')
   })
 }
 
@@ -341,7 +358,7 @@ $(() => {
   addBloodPressureInput.on("input", handleSysAndDiaFormat);
   editBloodPressureInput.on("input", handleSysAndDiaFormat);
 
-  // form submit
+  // add create entry
   addBloodPressureBtn.click(function (event) {
     event.preventDefault();
     var bothSysAndDia = addBloodPressureInput.val();
@@ -389,21 +406,43 @@ $(() => {
 
   // clear all data
   clearAllDataBtn.on("click", (e) => {
-    localStorage.clear("BP_TR_USER");
-    // Reload the page from the server, ignoring the cache
-    window.location.reload(true);
+    e.preventDefault()
+    modalOverlay.fadeIn()
+    confirmClearDataModal.fadeIn()
   });
 
+  closeConfirmClearBtn.on('click',(e)=>{
+    e.preventDefault()
+    modalOverlay.fadeOut()
+    confirmClearDataModal.fadeOut()
+  })
+  
+  confirmClearAllDataBtn.on("click", (e) => {
+    e.preventDefault()
+    // clear user
+    localStorage.clear(localUserId);
+    addAppAlert('alert', "All data has been successfully cleared. You may now close the app or wait for it to re-load.")
+
+    setTimeout(() => {
+      // Reload the page from the server, ignoring the cache
+      window.location.reload(true);
+    }, 5000)
+  });
+
+
+
   editBloodPressureSaveBtn.on("click", (e) => {
+    e.preventDefault()
+
     var bothSysAndDia = editBloodPressureInput.val();
     var pulseElmVal = editBloodPressurePulseInput.val();
     var noteElmVal = editBloodPressureNotesInput.val();
-    let sys = bothSysAndDia.split("/")[0];
-    let dia = bothSysAndDia.split("/")[1];
+    let sys = parseInt(bothSysAndDia.split("/")[0]);
+    let dia = parseInt(bothSysAndDia.split("/")[1]);
     let editFormData = {
       systolic: sys,
       diastolic: dia,
-      pulse: pulseElmVal,
+      pulse: parseInt(pulseElmVal),
       notes: noteElmVal,
     }
 
@@ -528,7 +567,7 @@ $(() => {
 
   footerBpTrackerBtn.click(function () {
     currentPage = 'bloodPressure'
-    setPage('Blood Pressure tracker', currentPage)
+    setPage('Blood Pressure Tracker', currentPage)
   })
 
   footerCabinetBtn.click(function () {
@@ -579,7 +618,7 @@ $(() => {
         item.notifyDate = returnRefillDate(item.originalQty, item.amount, item.schedule)
       }
     })
-    
+
     saveToLocal()
     renderCabinetCards()
   })

@@ -61,6 +61,19 @@
     </div>
   </div>
 
+  <!-- Confirm Delete All Data -->
+  <div id="confirm-clear-data-modal" style="display: none;"
+    class="flex flex-col absolute z-20 top-0 left-0 gap-3 h-full w-full bg-white p-4 dark:bg-zinc-950 dark:text-zinc-50 justify-center items-center">
+    <div class="flex justify-between items-center">
+      <p class="text-large">Clear All Data</p>
+    </div>
+    <p class="text-sm text-center">Are you sure you want to clear all saved data? When cleared, the app will reload and you can then remove this app safely or get started again.</p>
+
+    <button class="p-3 bg-red-600 text-white w-full text-center rounded-sm"
+      id="confirm-clear-all-data-btn">Yes clear all Data</button>
+    <button class="p-3 bg-zinc-200 dark:bg-zinc-800 text-white w-full text-center rounded-sm"
+      id="close-confirm-clear-btn">Cancel</button>
+  </div>
 
   <!-- Add Entry Modal -->
   <div id="add-bp-entry-modal" style="display: none;"
@@ -214,7 +227,8 @@
 
     <button id="add-cabinet-item-btn" class="p-3 bg-blue-600 text-white w-full text-center rounded-sm">Add
       Item</button>
-    <button id="delete-cabinet-item-btn" style="display: none;" class="p-3 bg-red-600 text-white w-full text-center rounded-sm">Delete</button>
+    <button id="delete-cabinet-item-btn" style="display: none;"
+      class="p-3 bg-red-600 text-white w-full text-center rounded-sm">Delete</button>
   </div>
 
   <!-- Adjust Birthday Modal -->
@@ -286,7 +300,7 @@
         name="settings-notify-take-bp-input">
         <label for="settings-notify-take-bp-input">Reminder to check Blood Pressure</label>
       </div> -->
-      
+
       <!-- This is to be phased out until actual backend is configured -->
       <!-- <div id="settings-notify-take-bp-time-block" class="flex flex-col gap-2" style="display: none;">
         <label for="settings-notify-take-bp-time-input">When to remind</label>
@@ -304,7 +318,7 @@
         <label for="blood-pressure-input">Data</label>
         <button id="copy-blood-pressure-data-btn" class="p-3 bg-blue-600 text-white w-full text-center rounded-sm">Copy
           Blood Pressure Data</button>
-        <button id="clear-all-data-btn" class="p-3 bg-red-600 text-white w-full text-center rounded-sm">Clear all
+        <button id="clear-all-data-btn" class="p-3 mt-3 bg-red-600 text-white w-full text-center rounded-sm">Clear all
           data</button>
       </div>
 
