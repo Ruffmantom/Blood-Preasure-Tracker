@@ -9,8 +9,8 @@
   <meta name="theme-color" content="#09090B" />
   <link rel="manifest" href="./utils/manifest.json" />
   <!-- ios support -->
-  <link rel="apple-touch-icon" href="./assets/images/mybp-app-logo.png" />
-  <link rel="icon" type="image/x-icon" href="./assets/icons/mybp-app-logo-96x96.ico" />
+  <link rel="apple-touch-icon" href="./assets/images/bp-tracker-256.png" />
+  <link rel="icon" type="image/x-icon" href="./assets/images/bp-tracker-rounded-256.ico" />
   <title>BP Tracker</title>
   <!-- jquery -->
   <script src="./js/libraries/jquery.js"></script>
@@ -40,7 +40,7 @@
 
   <!-- welcome overlay -->
   <div id="welcome-overlay" style="display: none;"
-    class="flex flex-col absolute z-20 top-0 left-0 gap-3 h-full w-full bg-white p-4 dark:bg-zinc-900 dark:text-zinc-50 justify-center items-center">
+    class="flex flex-col absolute z-20 top-0 left-0 gap-3 h-full w-full bg-white p-4 dark:bg-zinc-950 dark:text-zinc-50 justify-center items-center">
     <div class="flex flex-col">
       <div class="w-full mb-4">
         <div id="welcome-logo" class="p-4 max-w-[150px] m-auto">
@@ -130,12 +130,12 @@
       </button>
     </div>
     <!-- overflow  -->
-    <div class="flex flex-col gap-3 max-h-[50vh] overflow-y-auto">
+    <div id="cabinet-form-overflow" class="flex flex-col gap-3 max-h-[50vh] overflow-y-auto">
       <div class="flex flex-col gap-1 w-full ">
         <label for="add-cabinet-type-input">Type</label>
         <select name="add-cabinet-type-input" id="add-cabinet-type-input"
           class="w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-sm outline-none">
-          <option value="Medication" selected>Medication</option>
+          <option value="Medication" selected>Prescription</option>
           <option value="Supplement">Supplement</option>
         </select>
       </div>
@@ -155,14 +155,14 @@
       <div class="flex gap-2 w-full">
         <div class="flex flex-col gap-1 grow-1">
           <label for="add-cabinet-amount-input">Amount</label>
-          <input class="w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-sm outline-none" type="text"
+          <input class="w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-sm outline-none" type="number"
             id="add-cabinet-amount-input" name="add-cabinet-amount-input" placeholder="1">
         </div>
-        <div class="flex flex-col gap-1 grow-1">
+        <!-- <div class="flex flex-col gap-1 grow-1">
           <label for="add-cabinet-frequency-input">Frequency</label>
           <input class="w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-sm outline-none" type="text"
-            id="add-cabinet-frequency-input" name="add-cabinet-frequency-input" placeholder="1">
-        </div>
+            id="add-cabinet-frequency-input" name="add-cabinet-frequency-input" placeholder="times...">
+        </div> -->
         <div class="flex flex-col gap-1 grow-1">
           <label for="add-cabinet-schedule-input">Schedule</label>
           <select name="add-cabinet-schedule-input" id="add-cabinet-schedule-input"
@@ -214,6 +214,7 @@
 
     <button id="add-cabinet-item-btn" class="p-3 bg-blue-600 text-white w-full text-center rounded-sm">Add
       Item</button>
+    <button id="delete-cabinet-item-btn" style="display: none;" class="p-3 bg-red-600 text-white w-full text-center rounded-sm">Delete</button>
   </div>
 
   <!-- Adjust Birthday Modal -->
@@ -271,6 +272,26 @@
           <div id="inner-toggle" class="h-full relative w-1/2 bg-blue-600 rounded-sm">
           </div>
         </div>
+      </div> -->
+
+      <div class="flex gap-2">
+        <input class="w-5 h-5 bg-zinc-100 dark:bg-zinc-800 " type="checkbox" id="settings-allow-notify-input"
+          name="settings-allow-notify-input">
+        <label for="settings-allow-notify-input">Allow notifications</label>
+      </div>
+
+      <!-- This is to be phased out until actual backend is configured -->
+      <!-- <div class="flex gap-2">
+        <input class="w-5 h-5 bg-zinc-100 dark:bg-zinc-800 " type="checkbox" id="settings-notify-take-bp-input"
+        name="settings-notify-take-bp-input">
+        <label for="settings-notify-take-bp-input">Reminder to check Blood Pressure</label>
+      </div> -->
+      
+      <!-- This is to be phased out until actual backend is configured -->
+      <!-- <div id="settings-notify-take-bp-time-block" class="flex flex-col gap-2" style="display: none;">
+        <label for="settings-notify-take-bp-time-input">When to remind</label>
+        <input class="p-3 bg-zinc-100 dark:bg-zinc-800 rounded-sm outline-none" type="time"
+        id="settings-notify-take-bp-time-input" value="08:30" name="settings-notify-take-bp-time-input">
       </div> -->
 
       <div class="flex flex-col gap-1">

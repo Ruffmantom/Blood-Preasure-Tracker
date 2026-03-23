@@ -116,7 +116,7 @@ function categorizeBloodPressure(systolic, diastolic, age = 30) {
   return category;
 }
 
-function dounloadTxt(data, filename = "data.txt") {
+function downloadTxt(data, filename = "data.txt") {
   if (!Array.isArray(data)) data = [];
 
   // Build the text content using the stringData format
@@ -282,4 +282,58 @@ function isPrivateIPv4(hostname) {
     (a === 172 && b >= 16 && b <= 31) ||
     (a === 192 && b === 168)
   );
+}
+
+
+const returnRefillDate = (qty = 0, amount = 0, schedule = 'Daily') => {
+  const currentDate = new Date();
+
+  if (!qty || !amount || qty <= 0 || amount <= 0) return null;
+
+  const scheduleMap = {
+    'Daily': 1,
+    'Every morning': 1,
+    'Every evening': 1,
+    'Morning and evening': 2,
+    'At bedtime': 1,
+    'Every 6 hours': 4,
+    'Every 8 hours': 3,
+    'Every 12 hours': 2,
+    'Weekly': 1 / 7,
+  };
+
+  const dosesPerDay = scheduleMap[schedule] ?? 1;
+  const amountPerDay = amount * dosesPerDay;
+  const daysUntilEmpty = qty / amountPerDay;
+  const notifyDaysFromNow = Math.max(0, Math.floor(daysUntilEmpty - 7));
+
+  const notifyUserDate = new Date(currentDate);
+  notifyUserDate.setDate(notifyUserDate.getDate() + notifyDaysFromNow);
+
+  const year = notifyUserDate.getFullYear();
+  const month = String(notifyUserDate.getMonth() + 1).padStart(2, '0');
+  const day = String(notifyUserDate.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+};
+
+const getTodayString = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+};
+
+
+const sendNotification = (tag = "", message = "") => {
+  Notification.requestPermission(perm => {
+    if (perm) {
+      new Notification(message, {
+        tag: tag || undefined,
+        icon: "./assets/images/bp-tracker-rounded-256.png"
+      })
+    }
+  })
 }

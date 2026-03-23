@@ -1,27 +1,8 @@
-let appVersion = "2.0.0";
-let globalUser = null;
-let userLoaded = false;
-let activeModalDataNote = ""
-let activeModalDataId = ""
-let currentBloodPressureCardId = ''
-let currentCabinetCardId = ''
-const localUserId = 'O1LHQAMLTTIUVI2USHPGZOKKAJOVU4PCCBKF26Q7ZRNNHK496PPOV9THXRRGXEKH7T6M8WDXNKYLIDSWHQFMMSPWHCRLBPJKJ4YM'
-// pages are bloodPressure, cabinet, settings
-let currentPage = 'bloodPressure'
-const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
-const defaultUser = {
-  userAge: "",
-  userBirthday: "",
-  bp_theme_title: prefersDarkScheme ? "Dark" : "Light",
-  bp_data: [],
-  cabinet_data: [],
-  userStatus: "setup"
-};
-
 const saveToLocal = () => {
   localStorage.setItem(localUserId, JSON.stringify(globalUser));
 };
 
+// render Blood Pressure Cards
 const renderCards = () => {
   bloodPressureTrackerSection.empty()
   if (userLoaded && globalUser.bp_data.length >= 1) {
@@ -36,20 +17,76 @@ const renderCards = () => {
 
 };
 
+// checking refill status
+const checkUserRefills = () => {
+  // check notifyDates for cabinet items and notify user of any that have a date of today or past.
+  let today = getTodayString()
+  globalUser.cabinet_data.forEach(item => {
+    // check if notification had already been sent
+    if (item.notifyDate <= today) {
+      console.log('Need to refill...')
+      let foundLog = globalUser.notification_log.find(l => l.date === today && l.tag === item.name)
+      console.log('Found Log...', foundLog)
+      // set needsRefill
+      item.needsRefill = true
+      // notify user if have not already
+      if (!foundLog) {
+        console.log('Did not find notification log...')
+        let message = `Time to refill your ${item.name} - ${item.strength} you have roughly ${item.daysWorth} left.`
+        sendNotification(item.name, message)
+        // add notification to log
+        globalUser.notification_log.push({
+          date: today,
+          msg: message,
+          tag: item.name
+        })
+        saveToLocal()
+      }
+    } else {
+      item.needsRefill = false
+    }
+  })
+}
+
+// Render Cabinet Cards
 const renderCabinetCards = () => {
   cabinetSection.empty()
   if (userLoaded && globalUser.cabinet_data.length >= 1) {
-    globalUser.cabinet_data.forEach((d) => {
-      let element = cabinetItemComponent(d)
-      cabinetSection.prepend(element)
-    })
+    // load refill statuses
+    checkUserRefills()
+    // filter supplements and Prescriptions
+    let usersPrescriptions = globalUser.cabinet_data.filter(c => c.type === 'Medication')
+    let usersSupplements = globalUser.cabinet_data.filter(c => c.type === 'Supplement')
+
+    usersPrescriptions.sort((a, b) => {
+      return a.name.localeCompare(b.name);
+    });
+
+    usersSupplements.sort((a, b) => {
+      return a.name.localeCompare(b.name);
+    });
+
+    cabinetSection.prepend(`
+      ${usersPrescriptions.length >= 1 ? `<p class="">Prescriptions</p>
+          ${usersPrescriptions.map(m => (
+      cabinetItemComponent(m)
+    )).join('')}  
+        `: ""}
+
+      ${usersSupplements.length >= 1 ? `<p class="">Supplements</p>
+          ${usersSupplements.map(s => (
+      cabinetItemComponent(s)
+    )).join('')}  
+        `: ""}
+      `)
   } else {
     cabinetSection.append(`<p class="text-center">No data found</p>
       <p class="text-center">You have not added any cabinet items yet</p>`)
   }
-
 };
 
+// Load in theme
+// this will be phased out since is not using tailwind sense for device settings
 const loadTheme = () => {
   // set settings text
   if (globalUser.bp_theme_title === 'Dark') {
@@ -58,6 +95,8 @@ const loadTheme = () => {
   settingsThemeText.text(globalUser.bp_theme_title)
 };
 
+
+// this will be phased out since is not using tailwind sense for device settings
 themeToggleHandlerBtn.click(function () {
   if (globalUser.bp_theme_title === 'Light') {
     // left to right
@@ -71,6 +110,18 @@ themeToggleHandlerBtn.click(function () {
   saveToLocal()
   settingsThemeText.text(globalUser.bp_theme_title)
 })
+
+// Load in the settings info and values
+const loadInSettings = () => {
+  // set settings
+  settingsAllowNotifyInput.prop('checked', globalUser.allow_notifications)
+  settingsNotifyTakeBpInput.prop('checked', globalUser.notifyUser_take_bp)
+  settingsNotifyTakeBpTimeBlock.show()
+  settingsUsersAge.text(globalUser.userAge)
+  // set version
+  versionTextElm.text(appVersion)
+}
+
 
 // load program
 const loadUserOrCreate = () => {
@@ -94,8 +145,7 @@ const loadUserOrCreate = () => {
     } else {
       globalUser = parsedUser
       userLoaded = true;
-      // set settings
-      settingsUsersAge.text(parsedUser.userAge)
+
       // check for theme init
       if (globalUser.bp_theme_title === undefined || globalUser.bp_theme_title === null) {
         // add variable and save
@@ -105,6 +155,7 @@ const loadUserOrCreate = () => {
       }
       // load dom
       loadTheme();
+      loadInSettings();
       renderCards();
       renderCabinetCards();
     }
@@ -131,7 +182,8 @@ welcomeGetStartedBtn.on('click', function (e) {
   globalUser.userBirthday = birthday
   globalUser.userStatus = 'ready'
   // save user
-  saveToLocal()
+  saveToLocal();
+  loadInSettings();
   // close the welcome modal
   welcomeOverlay.fadeOut(() => {
     userBirthdayInput.val('')
@@ -177,21 +229,23 @@ const toggleAddEditCabinetItemForm = function () {
   if (currentCabinetCardId) {
     addEditCabinetFormTitle.text('Edit Cabinet Item')
     addCabinetItemBtn.text('Save')
+    deleteCabinetItemBtn.show()
   } else {
     addEditCabinetFormTitle.text('Add Cabinet Item')
     addCabinetItemBtn.text('Add Item')
+    deleteCabinetItemBtn.hide()
   }
 }
 
 const resetCabinetForm = () => {
   addCabinetTypeInput.val('Medication')
   addCabinetNameInput.val('')
-  addCabinetStrengthInput.val('')
-  addCabinetAmountInput.val('')
-  addCabinetFrequencyInput.val('')
+  addCabinetStrengthInput.val("")
+  addCabinetAmountInput.val(0)
+  addCabinetFrequencyInput.val(0)
   addCabinetScheduleInput.val('Daily')
   addCabinetNotesInput.val('')
-  addCabinetQtyInput.val('')
+  addCabinetQtyInput.val(0)
   addCabinetNotifyInput.prop('checked', false)
   addCabinetRefillLinkInput.val('')
   addCabinetPharmacyInput.val('')
@@ -207,13 +261,14 @@ const handleSaveCabinetItem = (data) => {
       d.name = data.name
       d.strength = data.strength
       d.amount = data.amount
-      d.frequency = data.frequency
+      d.frequency = data.frequency || 0
       d.schedule = data.schedule
       d.notes = data.notes
       d.daysWorth = data.daysWorth
       d.notifyUser = data.notifyUser
       d.refillLink = data.refillLink
       d.pharmacy = data.pharmacy
+      d.notifyDate = returnRefillDate(data.daysWorth, data.amount, data.schedule)
     }
   })
   // save to local
@@ -232,7 +287,7 @@ const handleSaveCabinetItem = (data) => {
   })
 }
 
-const addAppAlert = (type, text) => {
+const addAppAlert = (type, text, time = 5000) => {
   const notifyId = generateBPId()
   const notification = $(notificationComponent(type, text, notifyId))
 
@@ -242,7 +297,7 @@ const addAppAlert = (type, text) => {
     notification.fadeOut(400, () => {
       notification.remove()
     })
-  }, 3000)
+  }, time)
 }
 
 
@@ -282,11 +337,9 @@ const loadEditCabinetCardForm = (cardId) => {
 }
 
 
+
 $(() => {
   loadUserOrCreate();
-  // set version
-  versionTextElm.text(appVersion)
-
   // new input for systolic and diastolic
   // formats the value inside of these inputs
   addBloodPressureInput.on("input", handleSysAndDiaFormat);
@@ -324,16 +377,22 @@ $(() => {
   });
 
 
-  $("#download_csv_btn").on("click", (e) => {
+  // download data
+  copyBloodPressureDataBtn.on("click", (e) => {
     let date = new Date().toISOString();
     let dateName = formatDate(date);
     let formattedName = dateName.split(" ")[0].replace(/\//g, "-");
-    if (globalUser.bp_data.length >= 1) {
-      dounloadTxt(globalUser.bp_data, `BP-${formattedName}.txt`);
+    if (!globalUser.bp_data.length >= 1) {
+      addAppAlert('warning', 'There are no entries to download. Time to start tracking your blood pressure!')
+      return
     }
+
+    downloadTxt(globalUser.bp_data, `BP-${formattedName}.txt`);
+    addAppAlert('alert', 'Data has been downloaded as a text document!')
   });
 
-  $("#clear_all_data_btn").on("click", (e) => {
+  // clear all data
+  clearAllDataBtn.on("click", (e) => {
     localStorage.clear("BP_TR_USER");
     // Reload the page from the server, ignoring the cache
     window.location.reload(true);
@@ -368,6 +427,10 @@ $(() => {
     } else {
       modalOverlay.fadeIn()
       addCabinetItemModal.slideDown()
+      // scroll edit form to top
+      cabinetFormOverflow.animate({
+        scrollTop: 0
+      }, 'fast');
     }
   })
 
@@ -496,6 +559,10 @@ $(() => {
   // open edit blood pressure entry
   cabinetSection.on('click', ".cabinet-item-card-btn", function () {
     let cardId = $(this).data().cardid
+    // scroll edit form to top
+    cabinetFormOverflow.animate({
+      scrollTop: 0
+    }, 'fast');
     // open edit modal
     loadEditCabinetCardForm(cardId)
     currentCabinetCardId = cardId
@@ -504,6 +571,24 @@ $(() => {
     // open up form
     modalOverlay.fadeIn()
     addCabinetItemModal.slideDown()
+  })
+
+  // reset refill
+  cabinetSection.on('click', ".cabinet-item-reset-refill-btn", function (e) {
+    let id = $(this).data().itemid
+    console.log(`About to reset refill for: ${id}`)
+    globalUser.cabinet_data.forEach(item => {
+      if (item.id === id) {
+        console.log(`found item: ${item}`)
+        item.daysWorth = item.originalQty
+        item.needsRefill = false
+        item.notifyDate = returnRefillDate(item.originalQty, item.amount, item.schedule)
+      }
+    })
+    
+    console.log(`saving global and rendering items`)
+    saveToLocal()
+    renderCabinetCards()
   })
 
   // update users birthday
@@ -525,6 +610,29 @@ $(() => {
     changeAgeModal.slideUp()
   })
 
+  // add case for refill notifications on "As needed"
+  addCabinetNotifyInput.on('input', () => {
+    if (addCabinetNotifyInput.is(':checked')) {
+      if (addCabinetScheduleInput.val() === 'As needed') {
+        addAppAlert('warning', `You have "As needed" selected. Please choose a different schedule to enable refill notifications.`)
+      }
+
+      if (addCabinetQtyInput.val() <= 0) {
+        addAppAlert('warning', `Please add a Available Qty if you would like to be notified.`)
+      }
+
+      if (!globalUser.allow_notifications) {
+        addAppAlert('alert', 'Notifications have been turned on', 7000)
+        let timeout = setTimeout(() => {
+          sendNotification('enabled-notifications', 'Notifications have been enabled')
+          globalUser.allow_notifications = true
+          saveToLocal()
+          clearTimeout(timeout)
+        }, 3000);
+
+      }
+    }
+  })
 
   // add cabinet item
   addCabinetItemBtn.click(function (e) {
@@ -556,6 +664,17 @@ $(() => {
         return
       }
     }
+
+    if (medNotify && medQty <= 0) {
+      addAppAlert('warning', `Please add a Available Qty if you would like to be notified.`)
+      return
+    }
+
+    if (medNotify && medSched === "As needed") {
+      addAppAlert('warning', `You have "As needed" selected. Please choose a different schedule to enable refill notifications.`)
+      return
+    }
+
     if (!isEditing) {
       let newCabinetItem = new CabinetItem(medType, medName, medStrength, medAmount, medFreq, medSched, medNotes, medQty, medNotify, medRefillLink, medPharmacy)
       console.log(newCabinetItem)
@@ -588,6 +707,62 @@ $(() => {
       toggleAddEditCabinetItemForm()
       resetCabinetForm()
     })
+  })
+
+  // delete cabinet item
+  deleteCabinetItemBtn.click(function () {
+    if (!currentCabinetCardId) {
+      addAppAlert('danger', 'There was an issue deleting this item. Please reload the app and try again.')
+      return
+    }
+    globalUser.cabinet_data = globalUser.cabinet_data.filter(d => d.id !== currentCabinetCardId)
+    // render cards
+    renderCabinetCards()
+    // save to local
+    saveToLocal()
+    // clear state
+    currentCabinetCardId = ""
+    // close modal
+    modalOverlay.fadeOut()
+    addCabinetItemModal.slideUp(() => {
+      // return form to add
+      toggleAddEditCabinetItemForm()
+      resetCabinetForm()
+    })
+  })
+
+  // set up notifications
+  settingsAllowNotifyInput.on('input', function () {
+    if (!globalUser.allow_notifications) {
+      // turn on
+      globalUser.allow_notifications = true
+      saveToLocal()
+
+      sendNotification('enabled-notifications', 'Notifications have been enabled')
+    } else {
+      globalUser.allow_notifications = false
+      saveToLocal()
+    }
+  })
+
+  // set up Reminder for checking blood pressure
+  settingsNotifyTakeBpInput.on('input', function () {
+    if (settingsNotifyTakeBpInput.is(':checked')) {
+      settingsNotifyTakeBpTimeBlock.show()
+      globalUser.notifyUser_take_bp = true
+      saveToLocal()
+    } else {
+      globalUser.notifyUser_take_bp = false
+      saveToLocal()
+      settingsNotifyTakeBpTimeBlock.hide()
+    }
+
+  })
+
+  // phased out for now since no backend
+  settingsNotifyTakeBpTimeInput.on('input', function () {
+    globalUser.notifyUser_take_bp_when = settingsNotifyTakeBpTimeInput.val()
+    saveToLocal()
   })
 
 });

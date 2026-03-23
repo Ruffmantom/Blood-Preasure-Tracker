@@ -1,3 +1,29 @@
+// variables
+let appVersion = "2.0.0";
+const localUserId = 'O1LHQAMLTTIUVI2USHPGZOKKAJOVU4PCCBKF26Q7ZRNNHK496PPOV9THXRRGXEKH7T6M8WDXNKYLIDSWHQFMMSPWHCRLBPJKJ4YM'
+// pages are bloodPressure, cabinet, settings
+let currentPage = 'bloodPressure'
+
+// State
+let globalUser = null;
+let userLoaded = false;
+let activeModalDataNote = ""
+let activeModalDataId = ""
+let currentBloodPressureCardId = ''
+let currentCabinetCardId = ''
+const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
+const defaultUser = {
+    userAge: "",
+    userBirthday: "",
+    bp_theme_title: prefersDarkScheme ? "Dark" : "Light",
+    bp_data: [],
+    cabinet_data: [],
+    userStatus: "setup",
+    allow_notifications: false,
+    notification_log: []
+};
+
+
 // elements
 const headerTitle = $('#header-title')
 const footerTop = $('#footer-top')
@@ -9,6 +35,8 @@ const versionTextElm = $("#version")
 const userYearsOld = $("#user-years-old")
 const settingsUsersAge = $("#settings-users-age")
 const addEditCabinetFormTitle = $("#add-edit-cabinet-form-title")
+const cabinetFormOverflow = $("#cabinet-form-overflow")
+const settingsNotifyTakeBpTimeBlock = $("#settings-notify-take-bp-time-block")
 
 // inputs
 const addBloodPressureInput = $("#add-blood-pressure-input")
@@ -32,6 +60,10 @@ const addCabinetRefillLinkInput = $('#add-cabinet-refill-link-input')
 const addCabinetPharmacyInput = $('#add-cabinet-pharmacy-input')
 
 const updateUserBirthdayInput = $('#update-user-birthday-input')
+// settings
+const settingsAllowNotifyInput = $("#settings-allow-notify-input")
+const settingsNotifyTakeBpInput = $("#settings-notify-take-bp-input")
+const settingsNotifyTakeBpTimeInput = $("#settings-notify-take-bp-time-input")
 
 // sections
 const bloodPressureTrackerSection = $("#blood-pressure-tracker-section")
@@ -67,6 +99,7 @@ const closeChangeAgeModalBtn = $('#close-change-age-modal-btn')
 const updateUserBirthdayBtn = $('#update-user-birthday-btn')
 const openUpdateUserBirthdayBtn = $('#open-update-user-birthday-btn')
 const addCabinetItemBtn = $('#add-cabinet-item-btn')
+const deleteCabinetItemBtn = $('#delete-cabinet-item-btn')
 
 // toggle
 const themeToggleHandlerBtn = $('#theme-toggle-handler-btn')
@@ -102,11 +135,11 @@ class BloodPressureEntry {
 
 class CabinetItem {
     constructor(
-        type = "Medication",
+        type = "Prescriptions",
         name = "",
         strength = "",
-        amount = 1,
-        frequency = 1,
+        amount = 0,
+        frequency = 0,
         schedule = "Daily",
         notes = "",
         daysWorth = 0,
@@ -119,14 +152,17 @@ class CabinetItem {
         this.name = name
         this.strength = strength
         this.amount = amount
-        this.frequency = frequency
+        this.frequency = frequency // this is to be phased out...
         this.schedule = schedule
         this.notes = notes
         this.daysWorth = daysWorth
+        this.originalQty = daysWorth
         this.notifyUser = notifyUser
         this.refillLink = refillLink
         this.pharmacy = pharmacy
         this.updatedAt = ""
+        this.notifyDate = returnRefillDate(daysWorth,amount,schedule)
+        this.needsRefill = false
         this.createdAt = returnIsoString()
     }
     returnId() {

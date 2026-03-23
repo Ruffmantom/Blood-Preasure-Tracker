@@ -1,32 +1,3 @@
-const welcomeModal = () => {
-  return `
-    <div class="welcome_modal_overlay_cont">
-      <div class="welcome_modal_inner">
-        <div class="welcome_modal_header">
-          <h2>Welcome!</h2>
-          <p>Please enter your age to get started.</p>
-
-          <div class="form">
-            <div class="form_sec">
-              <p class="form_lable">Age</p>
-              <input
-                id="age_input"
-                type="number"
-                max="120"
-                placeholder="30"
-                class="form_elm"
-              />
-            </div>
-            <button id="submit_age_btn" class="btn btn_primary">Submit</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    `
-}
-
-
-
 const bloodPressureCardComponent = (data) => {
   let formattedCreatedAt = formatDate(data.updatedAt || data.createdAt)
   return `
@@ -52,6 +23,8 @@ const notificationComponent = (type = '', text = '', id = '') => {
     color = 'red'
   } else if (type === 'alert') {
     color = 'blue'
+  } else if (type === 'warning') {
+    color = 'orange'
   } else {
     color = 'zinc'
   }
@@ -101,12 +74,13 @@ const cabinetItemComponent = (data) => {
           ${data.notifyUser ? `<p class="text-xs text-green-600">Refill reminder</p>` : ""}
         </div>
         <p class="text-xl font-bold">${data.name} - ${data.strength}</p>
-        <p class="text-sm">${data.daysWorth} days remaining</p>
-        <p class="text-sm">Take ${data.amount} - ${data.frequency} time ${data.schedule}</p>
-        ${data.notes ? `<p class="text-sm">"${data.notes}"</p>` : ""}
+        <p class="text-sm">Take ${data.amount} - ${data.frequency ? `${data.frequency} times` : ""} ${data.schedule}</p>
         ${data.pharmacy ? `<p class="text-sm">Pharmacy: ${data.pharmacy}</p>` : ""}
+        ${data.notes ? `<p class="text-sm">"${data.notes}"</p>` : ""}
+        ${data.needsRefill ? `<p class="text-xs italic">Estimated ${data.daysWorth} left</p>`:""}
       </div>
-      ${data.refillLink ? `<a href="${data.refillLink}" target="_blank" id="edit-blood-pressure-save-btn" class="p-3 bg-zinc-200 dark:bg-zinc-800 text-white w-full text-center rounded-sm">Refill</a>` : ""}
+      ${data.refillLink ? `<a href="${data.refillLink}" target="_blank" class="p-3 bg-zinc-200 dark:bg-zinc-800 text-white w-full text-center rounded-sm">Refill Link</a>` : ""}
+      ${data.needsRefill ? `<button data-itemid="${data.id}" target="_blank" class="cabinet-item-reset-refill-btn p-3 bg-blue-600 text-white w-full text-center rounded-sm">Reset Refill</button>` : ""}
     </div>
   
   `
