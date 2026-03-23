@@ -24,14 +24,11 @@ const checkUserRefills = () => {
   globalUser.cabinet_data.forEach(item => {
     // check if notification had already been sent
     if (item.notifyDate <= today) {
-      console.log('Need to refill...')
       let foundLog = globalUser.notification_log.find(l => l.date === today && l.tag === item.name)
-      console.log('Found Log...', foundLog)
       // set needsRefill
       item.needsRefill = true
       // notify user if have not already
       if (!foundLog) {
-        console.log('Did not find notification log...')
         let message = `Time to refill your ${item.name} - ${item.strength} you have roughly ${item.daysWorth} left.`
         sendNotification(item.name, message)
         // add notification to log
@@ -256,7 +253,6 @@ const handleSaveCabinetItem = (data) => {
     // find data
     if (d.id === currentCabinetCardId) {
       // check to see if user has edited the note
-      console.log(d)
       d.type = data.type
       d.name = data.name
       d.strength = data.strength
@@ -576,17 +572,14 @@ $(() => {
   // reset refill
   cabinetSection.on('click', ".cabinet-item-reset-refill-btn", function (e) {
     let id = $(this).data().itemid
-    console.log(`About to reset refill for: ${id}`)
     globalUser.cabinet_data.forEach(item => {
       if (item.id === id) {
-        console.log(`found item: ${item}`)
         item.daysWorth = item.originalQty
         item.needsRefill = false
         item.notifyDate = returnRefillDate(item.originalQty, item.amount, item.schedule)
       }
     })
     
-    console.log(`saving global and rendering items`)
     saveToLocal()
     renderCabinetCards()
   })
@@ -638,7 +631,6 @@ $(() => {
   addCabinetItemBtn.click(function (e) {
     e.preventDefault()
     let isEditing = currentCabinetCardId !== ""
-    console.log(`is Editing? ${isEditing} currentCabinetCardId = ${currentCabinetCardId}`)
     let medType = addCabinetTypeInput.val()
     let medName = addCabinetNameInput.val()
     let medStrength = addCabinetStrengthInput.val()
@@ -677,7 +669,6 @@ $(() => {
 
     if (!isEditing) {
       let newCabinetItem = new CabinetItem(medType, medName, medStrength, medAmount, medFreq, medSched, medNotes, medQty, medNotify, medRefillLink, medPharmacy)
-      console.log(newCabinetItem)
       // add item
       globalUser.cabinet_data.push(newCabinetItem)
     } else {

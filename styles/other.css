@@ -5,7 +5,7 @@
     /* Name your font family */
     src: local('digital-7'),
         /* Optional: Check for local copy first */
-        url('../fonts/digital-7 (mono).ttf') format('truetype');
+        url('../fonts/digital-7-mono.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
