@@ -1,9 +1,9 @@
-# MyBP - Blood Pressure Tracker
+# Blood Pressure Tracker
 
 ![badge](https://img.shields.io/badge/PWA-Ready-brightgreen)
 ![badge](https://img.shields.io/badge/platform-Web-blue)
 
-MyBP is a Progressive Web App designed to help you track your blood pressure readings easily and efficiently. With a simple user interface, MyBP allows you to quickly add new records of your blood pressure readings, attach notes for context, and export all your data to a CSV file for sharing with your doctor.
+Blood Pressure Tracker is a Progressive Web App designed to help you track your blood pressure readings easily and efficiently. With a simple user interface, BPT allows you to quickly add new records of your blood pressure readings, attach notes for context, and export all your data to a Text file for sharing with your doctor.
 
 ## Table of Contents
 - [Features](#features)
@@ -16,12 +16,18 @@ MyBP is a Progressive Web App designed to help you track your blood pressure rea
 ## Features
 - Simple and intuitive UI for adding new blood pressure records.
 - Ability to add notes to each record for additional context.
-- Export functionality to download all your data as a CSV file, making it easy to share with healthcare professionals.
+- Export functionality to download all your data as a TXT file, making it easy to share with healthcare professionals.
 - Responsive design for ease of use on any device.
+- ### Since version 2.0.0
+- New navigation at footer of screen.
+- Ability to add cabinet items. This feature let's users input a prescription or supplement and can notify the user when they should refill.
+- New Settings
+- - Allow notifications
+- - Changing your age
 
 ## Installation
-MyBP can be accessed and installed in two ways:
-1. **Web Installation**: Navigate to the MyBP website on your mobile device [here](https://ruffmantom.github.io/Blood-Preasure-Tracker/). Use the share button in your browser and select "Add to Home Screen" to install the app for easy access.
+BPT can be accessed and installed in two ways:
+1. **Web Installation**: Navigate to the BPT website on your mobile device [here](https://ruffmantom.github.io/Blood-Preasure-Tracker/). Use the share button in your browser and select "Add to Home Screen" to install the app for easy access.
 2. **Local Installation**: Clone this repository and run it in your preferred browser. This method is ideal for developers looking to contribute or customize the app.
 
 ## Usage

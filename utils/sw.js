@@ -1,27 +1,45 @@
-var cacheName = "bp-app-v7";
+var cacheName = "bpt-v-2.0.0";
 var filesToCache = [
   "../",
   "../index.html",
-  "../css/clear.css",
-  "../css/ruffstyles.css",
-  "../css/style.css",
-  "../js/createHtml.js",
+  "../styles/other.css",
+  "../js/libraries/icons.js",
+  "../js/libraries/jquery.js",
+  "../js/libraries/tailwind.js",
+  "../js/components.js",
   "../js/helpers.js",
   "../js/index.js",
-  "../assets/images/mybp-app-logo.png",
-  "../assets/images/mybp-app-logo.webp",
-  "../assets/icons/mybp-app-logo-72x72.ico",
-  "../assets/icons/mybp-app-logo-96x96.ico",
-  "../assets/icons/mybp-app-logo-128x128.ico",
-  "../assets/icons/mybp-app-logo-256x256.ico",
-  "../assets/icons/close.png",
-  "../assets/icons/settings.png"
+  "../js/app.js",
+  "../assets/images/bp-tracker-48.png",
+  "../assets/images/bp-tracker-48.webp",
+  "../assets/images/bp-tracker-72.png",
+  "../assets/images/bp-tracker-96.png",
+  "../assets/images/bp-tracker-128.png",
+  "../assets/images/bp-tracker-256.png",
+  "../assets/images/bp-tracker-rounded-256.ico",
+  "../assets/images/bp-tracker-rounded-256.png",
+  "../fonts/digital-7-mono.ttf",
+  "../fonts/digital-7.ttf",
 ];
 
 self.addEventListener("install", function (e) {
   e.waitUntil(
-    caches.open(cacheName).then(function (cache) {
-      return cache.addAll(filesToCache);
+    caches.open(cacheName).then(async function (cache) {
+      for (const file of filesToCache) {
+        try {
+          const response = await fetch(file);
+          console.log("Caching:", file, response.status);
+
+          if (!response.ok) {
+            throw new Error(`Bad response for ${file}: ${response.status}`);
+          }
+
+          await cache.put(file, response.clone());
+        } catch (err) {
+          console.error("Failed to cache:", file, err);
+          throw err;
+        }
+      }
     })
   );
 });

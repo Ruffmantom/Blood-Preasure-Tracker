@@ -1,7 +1,6 @@
 function generateBPId() {
-  var prefix = "BP-";
   var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  var idLength = 8; // Length after "BP-" prefix
+  var idLength = 10;
   var randomId = "";
 
   for (var i = 0; i < idLength; i++) {
@@ -9,7 +8,35 @@ function generateBPId() {
     randomId += chars[randomIndex];
   }
 
-  return prefix + randomId;
+  return randomId;
+}
+
+const returnIsoString = () => {
+  const now = new Date();
+  const isoTime = now.toISOString();
+  return isoTime
+}
+
+const handleSysAndDiaFormat = function () {
+  // Get the current cursor position
+  var cursorPos = this.selectionStart;
+  var originalLength = this.value.length;
+
+  // Remove non-digits and the separator if it's not in the correct position
+  var value = $(this)
+    .val()
+    .replace(/[^0-9]/g, "");
+  if (value.length > 3) {
+    value = value.slice(0, 3) + "/" + value.slice(3);
+  }
+
+  $(this).val(value);
+
+  // Adjust cursor position after formatting
+  var newLength = this.value.length;
+  cursorPos = cursorPos + (newLength - originalLength);
+
+  this.setSelectionRange(cursorPos, cursorPos);
 }
 
 function formatDate(isoDateString) {
@@ -26,23 +53,21 @@ function formatDate(isoDateString) {
   const minute = pad(date.getMinutes());
 
   // Determine AM or PM suffix
-  const ampm = hour >= 12 ? "PM" : "AM";
+  const ampm = hour >= 12 ? "pm" : "am";
 
   // Convert hour to 12-hour format
   hour = hour % 12;
   hour = hour ? hour : 12; // the hour '0' should be '12'
 
   // Construct formatted date string
-  const formattedDate = `${month}/${day}/${year} @ ${pad(
+  const formattedDate = `${month}/${day}/${year} : ${pad(
     hour
   )}:${minute} ${ampm}`;
 
   return formattedDate;
 }
 
-function categorizeBloodPressure(bpReadings, age = 30) {
-  const systolic = parseInt(bpReadings.topNum, 10);
-  const diastolic = parseInt(bpReadings.bottomNum, 10);
+function categorizeBloodPressure(systolic, diastolic, age = 30) {
   let category = "Normal"; // Default category
 
   // Define age-specific thresholds
@@ -91,7 +116,7 @@ function categorizeBloodPressure(bpReadings, age = 30) {
   return category;
 }
 
-function dounloadTxt(data, filename = "data.txt") {
+function downloadTxt(data, filename = "data.txt") {
   if (!Array.isArray(data)) data = [];
 
   // Build the text content using the stringData format
@@ -168,4 +193,147 @@ const setDataModal = (data) => {
   $("#save_record_btn").attr('recordid', data._id)
   $("#delete_record_btn").attr('recordid', data._id)
 
+}
+
+function getAgeFromDateInput(dateValue) {
+  if (!dateValue) return null
+
+  const birthDate = new Date(dateValue)
+  if (Number.isNaN(birthDate.getTime())) return null
+
+  const today = new Date()
+  let age = today.getFullYear() - birthDate.getFullYear()
+
+  const hasHadBirthdayThisYear =
+    today.getMonth() > birthDate.getMonth() ||
+    (today.getMonth() === birthDate.getMonth() &&
+      today.getDate() >= birthDate.getDate())
+
+  if (!hasHadBirthdayThisYear) {
+    age--
+  }
+
+  return age
+}
+
+function checkLinkIsValid(linkToTest) {
+  if (typeof linkToTest !== 'string') return false;
+
+  const link = linkToTest.trim();
+  if (!link) return false;
+
+  // Reject whitespace inside the URL
+  if (/\s/.test(link)) return false;
+
+  // Reject obvious non-external / unsafe schemes
+  if (/^(javascript|data|vbscript|file|blob):/i.test(link)) return false;
+
+  let url;
+  try {
+    url = new URL(link);
+  } catch {
+    return false;
+  }
+
+  // Only allow absolute external http/https links
+  if (!['http:', 'https:'].includes(url.protocol)) return false;
+
+  // Must have a real hostname
+  if (!url.hostname) return false;
+
+  // Block localhost
+  if (
+    url.hostname === 'localhost' ||
+    url.hostname === '127.0.0.1' ||
+    url.hostname === '::1'
+  ) {
+    return false;
+  }
+
+  // Block private/internal IPv4 ranges
+  if (isPrivateIPv4(url.hostname)) return false;
+
+  // Optional: require a dot in non-IP hostnames so "http://intranet" fails
+  if (!isIPv4(url.hostname) && !url.hostname.includes('.')) return false;
+
+  return true;
+}
+
+function isIPv4(hostname) {
+  const parts = hostname.split('.');
+  if (parts.length !== 4) return false;
+
+  return parts.every(part => {
+    if (!/^\d+$/.test(part)) return false;
+    const n = Number(part);
+    return n >= 0 && n <= 255;
+  });
+}
+
+function isPrivateIPv4(hostname) {
+  if (!isIPv4(hostname)) return false;
+
+  const [a, b] = hostname.split('.').map(Number);
+
+  return (
+    a === 10 ||
+    a === 127 ||
+    (a === 169 && b === 254) ||
+    (a === 172 && b >= 16 && b <= 31) ||
+    (a === 192 && b === 168)
+  );
+}
+
+
+const returnRefillDate = (qty = 0, amount = 0, schedule = 'Daily') => {
+  const currentDate = new Date();
+
+  if (!qty || !amount || qty <= 0 || amount <= 0) return null;
+
+  const scheduleMap = {
+    'Daily': 1,
+    'Every morning': 1,
+    'Every evening': 1,
+    'Morning and evening': 2,
+    'At bedtime': 1,
+    'Every 6 hours': 4,
+    'Every 8 hours': 3,
+    'Every 12 hours': 2,
+    'Weekly': 1 / 7,
+  };
+
+  const dosesPerDay = scheduleMap[schedule] ?? 1;
+  const amountPerDay = amount * dosesPerDay;
+  const daysUntilEmpty = qty / amountPerDay;
+  const notifyDaysFromNow = Math.max(0, Math.floor(daysUntilEmpty - 7));
+
+  const notifyUserDate = new Date(currentDate);
+  notifyUserDate.setDate(notifyUserDate.getDate() + notifyDaysFromNow);
+
+  const year = notifyUserDate.getFullYear();
+  const month = String(notifyUserDate.getMonth() + 1).padStart(2, '0');
+  const day = String(notifyUserDate.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+};
+
+const getTodayString = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+};
+
+
+const sendNotification = (tag = "", message = "") => {
+  Notification.requestPermission(perm => {
+    if (perm) {
+      new Notification(message, {
+        tag: tag || undefined,
+        icon: "./assets/images/bp-tracker-rounded-256.png"
+      })
+    }
+  })
 }
