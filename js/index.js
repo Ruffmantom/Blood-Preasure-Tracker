@@ -1,5 +1,5 @@
 // variables
-let appVersion = "2.0.2";
+let appVersion = "2.0.3";
 const localUserId = 'O1LHQAMLTTIUVI2USHPGZOKKAJOVU4PCCBKF26Q7ZRNNHK496PPOV9THXRRGXEKH7T6M8WDXNKYLIDSWHQFMMSPWHCRLBPJKJ4YM'
 // pages are bloodPressure, cabinet, settings
 let currentPage = 'bloodPressure'

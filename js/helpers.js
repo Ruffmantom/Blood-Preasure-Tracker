@@ -122,8 +122,8 @@ function downloadTxt(data, filename = "data.txt") {
   // Build the text content using the stringData format
   let stringData = "";
   data.forEach((d) => {
-    const note = d.notes ? String(d.note).replace(/\r?\n/g, " ") : "";
-    stringData += `• ${formatDate(d.createdAt)} - (${d.systolic}/${d.diastolic}) ${d.pulse ? `| Pulse rate: ${d.pulse}`:""} ${d.notes ? note : ""}\n`;
+    const note = String(d.notes).replace(/\r?\n/g, " ") || ""
+    stringData += `• ${formatDate(d.createdAt)} - (${d.systolic}/${d.diastolic}) ${d.pulse ? `| Pulse rate: ${d.pulse}`:""} ${d?.notes ? note : ""}\n`;
   }); 
 
   // Create a plain-text blob and trigger download
