@@ -1,4 +1,4 @@
-var cacheName = "bpt-v-2.0.1";
+var cacheName = "bpt-v-2.0.2";
 var filesToCache = [
   "../",
   "../index.html",
