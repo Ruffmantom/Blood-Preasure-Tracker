@@ -11,10 +11,16 @@ function generateBPId() {
   return randomId;
 }
 
-const returnIsoString = () => {
-  const now = new Date();
-  const isoTime = now.toISOString();
-  return isoTime
+const returnIsoString = (returnYesterday) => {
+  const today = new Date();
+  if (!returnYesterday) {
+    const isoTime = today.toISOString();
+    return isoTime
+  } else {
+    let yesterday = new Date(today)
+    yesterday.setDate(today.getDate()-1)
+    return yesterday.toISOString()
+  }
 }
 
 const handleSysAndDiaFormat = function () {
@@ -123,8 +129,8 @@ function downloadTxt(data, filename = "data.txt") {
   let stringData = "";
   data.forEach((d) => {
     const note = String(d.notes).replace(/\r?\n/g, " ") || ""
-    stringData += `• ${formatDate(d.createdAt)} - (${d.systolic}/${d.diastolic}) ${d.pulse ? `| Pulse rate: ${d.pulse}`:""} ${d?.notes ? note : ""}\n`;
-  }); 
+    stringData += `• ${formatDate(d.createdAt)} - (${d.systolic}/${d.diastolic}) ${d.pulse ? `| Pulse rate: ${d.pulse}` : ""} ${d?.notes ? note : ""}\n`;
+  });
 
   // Create a plain-text blob and trigger download
   const blob = new Blob([stringData], { type: "text/plain;charset=utf-8" });
@@ -159,40 +165,6 @@ const returnBpCategoryClass = (cat) => {
       break;
   }
   return className
-}
-
-const clearDataModal = () => {
-  // reset
-  $("#overlay_record_index").text("")
-  $("#modal_top_num").text("")
-  $("#modal_bot_num").text("")
-  $("#overlay_note_input").val()
-  $("#overlay_record_date").text("")
-  $("#modal_bp_category").text("")
-  $("#modal_bp_category").text("")
-  $("#modal_bp_category").removeClass("danger")
-  $("#modal_bp_category").removeClass("normal")
-  $("#modal_bp_category").removeClass("caution")
-  $("#save_record_btn").attr('recordid', "")
-  $("#delete_record_btn").attr('recordid', "")
-}
-const setDataModal = (data) => {
-  clearDataModal()
-  // set elements
-  $("#overlay_record_index").text(data._id)
-  $("#modal_top_num").text(data.topNum)
-  $("#modal_bot_num").text(data.bottomNum)
-  $("#overlay_note_input").val(data.note)
-  $("#overlay_record_date").text(formatDate(data.recordedAt))
-  let category = categorizeBloodPressure(data, globalUser.userAge)
-  let categoryClass = returnBpCategoryClass(category)
-
-  $("#modal_bp_category").text(category)
-  $("#modal_bp_category").addClass(categoryClass)
-  // set save and delete btn ids
-  $("#save_record_btn").attr('recordid', data._id)
-  $("#delete_record_btn").attr('recordid', data._id)
-
 }
 
 function getAgeFromDateInput(dateValue) {
@@ -340,12 +312,12 @@ const getTodayString = () => {
 };
 
 
-const sendNotification = (tag = "",title="", message = "") => {
+const sendNotification = (tag = "", title = "", message = "") => {
   Notification.requestPermission(perm => {
     if (perm) {
       new Notification(title, {
         tag: tag || undefined,
-        body:message,
+        body: message,
         icon: "./assets/images/bp-tracker-rounded-256.png"
       })
     }

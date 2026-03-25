@@ -111,6 +111,7 @@ const deleteCabinetItemBtn = $('#delete-cabinet-item-btn')
 const closeConfirmClearBtn = $("#close-confirm-clear-btn")
 const confirmClearAllDataBtn = $("#confirm-clear-all-data-btn")
 const footerBtn = $('.footer-btn')
+const notificationsMarkAllReadBtn = $('#notifications-mark-all-read-btn')
 // toggle
 const themeToggleHandlerBtn = $('#theme-toggle-handler-btn')
 const parentToggle = $('#parent-toggle')
@@ -199,7 +200,7 @@ class AppNotifications {
         this.tag = tag
         this.title = title
         this.message = message
-        this.hasViewed = false
+        this.read = false
         this.link = link
         this.createdAt = returnIsoString()
     }

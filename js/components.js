@@ -5,7 +5,7 @@ const bloodPressureCardComponent = (data) => {
 dark:border-zinc-800 rounded-md relative">
     <div data-cardid="${data.id}" class="blood-pressure-card-btn absolute top-0 left-0 w-full h-full"></div>
     <div class="flex flex-col grow-1 gap-1">
-      <p class="text-xs py-[2px] px-[6px] rounded-sm ${data.bloodPressureRating === "High" ? "bg-red-600" : data.bloodPressureRating === "low" ? "bg-orange-600" : "bg-blue-600"} text-white w-max">${data.bloodPressureRating}</p>
+      <p class="text-xs py-[2px] px-[6px] rounded-sm ${data.bloodPressureRating === "High" ? "bg-red-600" : data.bloodPressureRating === "Low" ? "bg-orange-500" : "bg-blue-600"} text-white w-max">${data.bloodPressureRating}</p>
       <p class="text-xs">${data.updatedAt ? `Updated: ${formattedCreatedAt}` : formattedCreatedAt}</p>
       <p class="truncate-2-lines w-full">${data.notes ? `"${data.notes}"` : ""}</p>
     </div>
@@ -18,7 +18,7 @@ dark:border-zinc-800 rounded-md relative">
   `
 }
 
-const notificationComponent = (type = '', text = '', id = '') => {
+const appAlertComponent = (type = '', text = '', id = '') => {
   let color = 'zinc'
   if (type === 'danger') {
     color = 'red'

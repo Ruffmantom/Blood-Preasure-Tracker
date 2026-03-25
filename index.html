@@ -306,8 +306,11 @@
 
 
   <!-- header -->
-  <div id="header-section" class="p-4 pt-12">
+  <div id="header-section" class="p-4 pt-12 flex justify-between items-center">
     <p class="text-lg font-medium" id="header-title">Blood Pressure Tracker</p>
+    <div id="header-btn-section" class="">
+      <button id="notifications-mark-all-read-btn" class="flex gap-1 items-center px-1 text-xs">Mark all as read</button>
+    </div>
   </div>
 
   <!-- main content section -->
@@ -341,12 +344,14 @@
         </div>
       </div> -->
 
-      <div class="flex gap-2">
-        <input class="w-5 h-5 bg-zinc-100 dark:bg-zinc-800 " type="checkbox" id="settings-allow-notify-input"
+      <div class="flex flex-col gap-2 w-full">
+        <div class="flex gap-2">
+          <input class="w-5 h-5 bg-zinc-100 dark:bg-zinc-800 " type="checkbox" id="settings-allow-notify-input"
           name="settings-allow-notify-input">
-        <label for="settings-allow-notify-input">Allow notifications</label>
+          <label for="settings-allow-notify-input">Allow push notifications</label>
+        </div>
+        <p class="text-xs">Notifications that will be sent to your phone.</p>
       </div>
-
       <!-- This is to be phased out until actual backend is configured -->
       <!-- <div class="flex gap-2">
         <input class="w-5 h-5 bg-zinc-100 dark:bg-zinc-800 " type="checkbox" id="settings-notify-take-bp-input"

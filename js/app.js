@@ -7,7 +7,7 @@ const renderCards = () => {
   bloodPressureTrackerSection.empty()
   if (userLoaded && globalUser.bp_data.length >= 1) {
     let sortedCards = globalUser.bp_data.sort((a, b) => a.createdAt - b.createdAt)
-   sortedCards.forEach((d) => {
+    sortedCards.forEach((d) => {
       let element = bloodPressureCardComponent(d)
       bloodPressureTrackerSection.prepend(element)
     })
@@ -91,6 +91,49 @@ const renderCabinetCards = () => {
       <p class="text-center">You have not added any cabinet items yet</p>`)
   }
 };
+
+// load in all notifications
+const renderAppNotifications = () => {
+  if (globalUser.app_notifications.length >= 1) {
+    let todaysIso = returnIsoString()
+    let yesterdaysIso = returnIsoString(true)
+    // render out recent, yesterdays, and a while ago
+    const todaysNotifications = globalUser.app_notifications.filter(n => n.createdAt.split('T')[0] === todaysIso.split("T")[0])
+    const yesterdaysNotifications = globalUser.app_notifications.filter(n => n.createdAt.split('T')[0] === yesterdaysIso.split("T")[0])
+    const beyondNotifications = globalUser.app_notifications.filter(n => n.createdAt.split('T')[0] < yesterdaysIso.split("T")[0])
+
+    notificationsSection.append(`
+  ${todaysNotifications.length >= 1 ? `<p>Today</p>
+    ${todaysNotifications.map(n => (
+      notificationItemComponent(n)
+    ))}
+    `: ""}
+  ${yesterdaysNotifications.length >= 1 ? `<p>Yesterday</p>
+    ${yesterdaysNotifications.map(n => (
+      notificationItemComponent(n)
+    ))}
+    `: ""}
+  ${beyondNotifications.length >= 1 ? `<p>Beyond</p>
+    ${beyondNotifications.map(n => (
+      notificationItemComponent(n)
+    ))}
+    `: ""}
+  `)
+
+  } else {
+    notificationsSection.append(`
+      <p>You have no new notifications</p>   
+      `)
+  }
+}
+
+notificationsMarkAllReadBtn.click(e => {
+  e.preventDefault()
+  let a = new AppNotifications("test", "Time for a refill!", `It looks like your Labetalol 200mg is almost out and ready for a refill. be sure to contact your pharmacy to see if it is ready.`, '#')
+  globalUser.app_notifications.push(a)
+  saveToLocal()
+  renderAppNotifications()
+})
 
 // Load in theme
 // this will be phased out since is not using tailwind sense for device settings
@@ -177,6 +220,7 @@ const loadUserOrCreate = () => {
       loadInSettings();
       renderCards();
       renderCabinetCards();
+      renderAppNotifications()
     }
   }
 };
@@ -329,7 +373,7 @@ const handleSaveCabinetItem = (data) => {
 
 const addAppAlert = (type, text, time = 5000) => {
   const notifyId = generateBPId()
-  const notification = $(notificationComponent(type, text, notifyId))
+  const notification = $(appAlertComponent(type, text, notifyId))
 
   notificationContainer.prepend(notification)
 
@@ -383,56 +427,56 @@ const loadEditCabinetCardForm = (cardId) => {
 }
 
 // toggle footer button classes
-  const toggleCurrentPage = (currentButton, currentSection, title) => {
-    const sectionTitleMap = {
-      bloodPressure: "Blood Pressure Tracker",
-      cabinet: "Cabinet",
-      settings: "Settings",
-      notifications: "Notifications",
-    }
-    headerTitle.text(sectionTitleMap[title])
-    // set all other buttons inactive
-    let allFooterBtns = Array.from($('.footer-btn'))
-    let allSections = Array.from($('.section-container'))
-    allFooterBtns.forEach(btn => {
-      $(btn).addClass('border-zinc-50/0 fill-zinc-950 dark:fill-zinc-50')
-      $(btn).removeClass('border-blue-600 fill-blue-600')
-    })
-    allSections.forEach(section => {
-      $(section).hide()
-    })
-    // set current
-    $(currentSection).show()
-    $(currentButton).removeClass('border-zinc-50/0 fill-zinc-950 dark:fill-zinc-50')
-    $(currentButton).addClass('border-blue-600 fill-blue-600')
+const toggleCurrentPage = (currentButton, currentSection, title) => {
+  const sectionTitleMap = {
+    bloodPressure: "Blood Pressure Tracker",
+    cabinet: "Cabinet",
+    settings: "Settings",
+    notifications: "Notifications",
   }
+  headerTitle.text(sectionTitleMap[title])
+  // set all other buttons inactive
+  let allFooterBtns = Array.from($('.footer-btn'))
+  let allSections = Array.from($('.section-container'))
+  allFooterBtns.forEach(btn => {
+    $(btn).addClass('border-zinc-50/0 fill-zinc-950 dark:fill-zinc-50')
+    $(btn).removeClass('border-blue-600 fill-blue-600')
+  })
+  allSections.forEach(section => {
+    $(section).hide()
+  })
+  // set current
+  $(currentSection).show()
+  $(currentButton).removeClass('border-zinc-50/0 fill-zinc-950 dark:fill-zinc-50')
+  $(currentButton).addClass('border-blue-600 fill-blue-600')
+}
 
-  // set and load page
-  const setPage = ( pageId) => {
-    if (pageId === 'bloodPressure') {
-      // footer add
-      footerTop.show()
-      // add and remove classes
-      toggleCurrentPage(footerBpTrackerBtn, bloodPressureTrackerSection, pageId)
-    } else if (pageId === 'cabinet') {
-      // footer add
-      footerTop.show()
-      // add and remove classes
-      toggleCurrentPage(footerCabinetBtn, cabinetSection, pageId)
-    } else if (pageId === 'settings') {
-      // footer Add
-      footerTop.hide()
-      // add and remove classes
-      toggleCurrentPage(footerSettingsBtn, settingsSection, pageId)
-    } else if (pageId === 'notifications') {
-      // footer Add
-      footerTop.hide()
-      // add and remove classes
-      toggleCurrentPage(footerNotificationsBtn, notificationsSection, pageId)
-    } else {
-      return
-    }
+// set and load page
+const setPage = (pageId) => {
+  if (pageId === 'bloodPressure') {
+    // footer add
+    footerTop.show()
+    // add and remove classes
+    toggleCurrentPage(footerBpTrackerBtn, bloodPressureTrackerSection, pageId)
+  } else if (pageId === 'cabinet') {
+    // footer add
+    footerTop.show()
+    // add and remove classes
+    toggleCurrentPage(footerCabinetBtn, cabinetSection, pageId)
+  } else if (pageId === 'settings') {
+    // footer Add
+    footerTop.hide()
+    // add and remove classes
+    toggleCurrentPage(footerSettingsBtn, settingsSection, pageId)
+  } else if (pageId === 'notifications') {
+    // footer Add
+    footerTop.hide()
+    // add and remove classes
+    toggleCurrentPage(footerNotificationsBtn, notificationsSection, pageId)
+  } else {
+    return
   }
+}
 
 $(() => {
   loadUserOrCreate();
