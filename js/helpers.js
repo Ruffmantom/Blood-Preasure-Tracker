@@ -285,10 +285,23 @@ function isPrivateIPv4(hostname) {
 }
 
 
-const returnRefillDate = (qty = 0, amount = 0, schedule = 'Daily') => {
-  const currentDate = new Date();
+const returnRefillDate = (
+  dateStarted = '',
+  receivedQty = 0,
+  doseAmount = 0,
+  schedule = 'Daily'
+) => {
+  const baseDate = dateStarted ? new Date(dateStarted) : new Date();
 
-  if (!qty || !amount || qty <= 0 || amount <= 0) return null;
+  if (
+    Number.isNaN(baseDate.getTime()) ||
+    !receivedQty ||
+    !doseAmount ||
+    receivedQty <= 0 ||
+    doseAmount <= 0
+  ) {
+    return null;
+  }
 
   const scheduleMap = {
     'Daily': 1,
@@ -303,12 +316,12 @@ const returnRefillDate = (qty = 0, amount = 0, schedule = 'Daily') => {
   };
 
   const dosesPerDay = scheduleMap[schedule] ?? 1;
-  const amountPerDay = amount * dosesPerDay;
-  const daysUntilEmpty = qty / amountPerDay;
-  const notifyDaysFromNow = Math.max(0, Math.floor(daysUntilEmpty - 7));
+  const amountPerDay = doseAmount * dosesPerDay;
+  const daysUntilEmpty = receivedQty / amountPerDay;
+  const notifyDaysFromStart = Math.max(0, Math.floor(daysUntilEmpty - 7));
 
-  const notifyUserDate = new Date(currentDate);
-  notifyUserDate.setDate(notifyUserDate.getDate() + notifyDaysFromNow);
+  const notifyUserDate = new Date(baseDate);
+  notifyUserDate.setDate(notifyUserDate.getDate() + notifyDaysFromStart);
 
   const year = notifyUserDate.getFullYear();
   const month = String(notifyUserDate.getMonth() + 1).padStart(2, '0');
@@ -327,11 +340,12 @@ const getTodayString = () => {
 };
 
 
-const sendNotification = (tag = "", message = "") => {
+const sendNotification = (tag = "",title="", message = "") => {
   Notification.requestPermission(perm => {
     if (perm) {
-      new Notification(message, {
+      new Notification(title, {
         tag: tag || undefined,
+        body:message,
         icon: "./assets/images/bp-tracker-rounded-256.png"
       })
     }

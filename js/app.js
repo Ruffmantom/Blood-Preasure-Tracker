@@ -7,7 +7,7 @@ const renderCards = () => {
   bloodPressureTrackerSection.empty()
   if (userLoaded && globalUser.bp_data.length >= 1) {
     let sortedCards = globalUser.bp_data.sort((a, b) => a.createdAt - b.createdAt)
-    globalUser.bp_data.forEach((d) => {
+   sortedCards.forEach((d) => {
       let element = bloodPressureCardComponent(d)
       bloodPressureTrackerSection.prepend(element)
     })
@@ -20,28 +20,37 @@ const renderCards = () => {
 
 // checking refill status
 const checkUserRefills = () => {
+  console.log('checking refills')
   // check notifyDates for cabinet items and notify user of any that have a date of today or past.
   let today = getTodayString()
   globalUser.cabinet_data.forEach(item => {
+    if (!item.notifyUser) {
+      console.log('Skipping item...')
+      return
+    }
     // check if notification had already been sent
-    if (item.notifyDate <= today) {
+    console.log('Checking item...')
+    if (item.needsRefill || item.tracking.refillReminderBy <= today) {
       let foundLog = globalUser.notification_log.find(l => l.date === today && l.tag === item.name)
       // set needsRefill
       item.needsRefill = true
       // notify user if have not already
       if (!foundLog) {
-        let message = `Time to refill your ${item.name} - ${item.strength} you have roughly ${item.daysWorth} left.`
-        sendNotification(item.name, message)
+        let message = `Time to refill your ${item.name} - ${item.strength.value} ${item.strength.unit}.`
+        sendNotification(item.name, "Refill reminder", message)
+        // create app notification
+        let newAppNotification = new AppNotifications(item.name, "Refill reminder", message)
+        // push new notification
+        globalUser.app_notifications.push(newAppNotification)
         // add notification to log
         globalUser.notification_log.push({
           date: today,
           msg: message,
-          tag: item.name
+          tag: item.name,
+          appNotification: newAppNotification.id
         })
         saveToLocal()
       }
-    } else {
-      item.needsRefill = false
     }
   })
 }
@@ -65,13 +74,13 @@ const renderCabinetCards = () => {
     });
 
     cabinetSection.prepend(`
-      ${usersPrescriptions.length >= 1 ? `<p class="">Prescriptions</p>
+      ${usersPrescriptions.length >= 1 ? `<p class="">Prescriptions ${usersPrescriptions.length}</p>
           ${usersPrescriptions.map(m => (
       cabinetItemComponent(m)
     )).join('')}  
         `: ""}
 
-      ${usersSupplements.length >= 1 ? `<p class="">Supplements</p>
+      ${usersSupplements.length >= 1 ? `<p class="">Supplements ${usersSupplements.length}</p>
           ${usersSupplements.map(s => (
       cabinetItemComponent(s)
     )).join('')}  
@@ -92,6 +101,18 @@ const loadTheme = () => {
   }
   settingsThemeText.text(globalUser.bp_theme_title)
 };
+
+// toggle cabinet tracking inputs
+const toggleCabinetTrackingInputs = (show) => {
+  if (show) {
+    // hide qty and started date and notify
+    addCabinetItemTrackingQtyAndStartedCont.show()
+    addCabinetItemTrackingNotifyCont.show()
+  } else {
+    addCabinetItemTrackingQtyAndStartedCont.hide()
+    addCabinetItemTrackingNotifyCont.hide()
+  }
+}
 
 
 // this will be phased out since is not using tailwind sense for device settings
@@ -252,17 +273,21 @@ const toggleAddEditCabinetItemForm = function () {
 }
 
 const resetCabinetForm = () => {
-  addCabinetTypeInput.val('Medication')
   addCabinetNameInput.val('')
-  addCabinetStrengthInput.val("")
+  addCabinetTypeInput.val('Medication')
+  addCabinetFormInput.val("Pill")
+  addCabinetStrengthInput.val(0)
+  addCabinetStrengthUnitInput.val("mg")
   addCabinetAmountInput.val(0)
-  addCabinetFrequencyInput.val(0)
   addCabinetScheduleInput.val('Daily')
   addCabinetNotesInput.val('')
-  addCabinetQtyInput.val(0)
+  addCabinetReceivedQtyInput.val(0)
+  addCabinetStartedInput.val('')
   addCabinetNotifyInput.prop('checked', false)
   addCabinetRefillLinkInput.val('')
   addCabinetPharmacyInput.val('')
+  // bring back the tracking portion if removed
+  toggleCabinetTrackingInputs(true)
 }
 
 const handleSaveCabinetItem = (data) => {
@@ -272,16 +297,18 @@ const handleSaveCabinetItem = (data) => {
       // check to see if user has edited the note
       d.type = data.type
       d.name = data.name
-      d.strength = data.strength
-      d.amount = data.amount
-      d.frequency = data.frequency || 0
-      d.schedule = data.schedule
+      d.form = data.form
+      d.strength.value = data.strength
+      d.strength.unit = data.strengthUnit
+      d.dose.value = data.amount
+      d.dose.schedule = data.schedule
       d.notes = data.notes
-      d.daysWorth = data.daysWorth
+      d.tracking.startDate = data.startDate
+      d.tracking.startQty = data.receivedQty
       d.notifyUser = data.notifyUser
       d.refillLink = data.refillLink
       d.pharmacy = data.pharmacy
-      d.notifyDate = returnRefillDate(data.daysWorth, data.amount, data.schedule)
+      d.notifyDate = returnRefillDate(data.startDate, data.receivedQty, data.amount, data.schedule)
     }
   })
   // save to local
@@ -336,23 +363,80 @@ const loadEditCabinetCardForm = (cardId) => {
     return
   }
 
+  if (foundCard.form === 'Powder' || foundCard.dose.schedule === 'As needed') {
+    toggleCabinetTrackingInputs(false)
+  }
+
   addCabinetTypeInput.val(foundCard.type)
   addCabinetNameInput.val(foundCard.name)
-  addCabinetStrengthInput.val(foundCard.strength)
-  addCabinetAmountInput.val(foundCard.amount)
-  addCabinetFrequencyInput.val(foundCard.frequency)
-  addCabinetScheduleInput.val(foundCard.schedule)
+  addCabinetFormInput.val(foundCard.form)
+  addCabinetStrengthInput.val(foundCard.strength.value)
+  addCabinetStrengthUnitInput.val(foundCard.strength.unit)
+  addCabinetAmountInput.val(foundCard.dose.value)
+  addCabinetScheduleInput.val(foundCard.dose.schedule)
   addCabinetNotesInput.val(foundCard.notes)
-  addCabinetQtyInput.val(foundCard.daysWorth)
+  addCabinetReceivedQtyInput.val(foundCard.tracking.startQty)
+  addCabinetStartedInput.val(foundCard.tracking.startDate)
   addCabinetNotifyInput.prop('checked', foundCard.notifyUser);
   addCabinetRefillLinkInput.val(foundCard.refillLink)
   addCabinetPharmacyInput.val(foundCard.pharmacy)
 }
 
+// toggle footer button classes
+  const toggleCurrentPage = (currentButton, currentSection, title) => {
+    const sectionTitleMap = {
+      bloodPressure: "Blood Pressure Tracker",
+      cabinet: "Cabinet",
+      settings: "Settings",
+      notifications: "Notifications",
+    }
+    headerTitle.text(sectionTitleMap[title])
+    // set all other buttons inactive
+    let allFooterBtns = Array.from($('.footer-btn'))
+    let allSections = Array.from($('.section-container'))
+    allFooterBtns.forEach(btn => {
+      $(btn).addClass('border-zinc-50/0 fill-zinc-950 dark:fill-zinc-50')
+      $(btn).removeClass('border-blue-600 fill-blue-600')
+    })
+    allSections.forEach(section => {
+      $(section).hide()
+    })
+    // set current
+    $(currentSection).show()
+    $(currentButton).removeClass('border-zinc-50/0 fill-zinc-950 dark:fill-zinc-50')
+    $(currentButton).addClass('border-blue-600 fill-blue-600')
+  }
 
+  // set and load page
+  const setPage = ( pageId) => {
+    if (pageId === 'bloodPressure') {
+      // footer add
+      footerTop.show()
+      // add and remove classes
+      toggleCurrentPage(footerBpTrackerBtn, bloodPressureTrackerSection, pageId)
+    } else if (pageId === 'cabinet') {
+      // footer add
+      footerTop.show()
+      // add and remove classes
+      toggleCurrentPage(footerCabinetBtn, cabinetSection, pageId)
+    } else if (pageId === 'settings') {
+      // footer Add
+      footerTop.hide()
+      // add and remove classes
+      toggleCurrentPage(footerSettingsBtn, settingsSection, pageId)
+    } else if (pageId === 'notifications') {
+      // footer Add
+      footerTop.hide()
+      // add and remove classes
+      toggleCurrentPage(footerNotificationsBtn, notificationsSection, pageId)
+    } else {
+      return
+    }
+  }
 
 $(() => {
   loadUserOrCreate();
+  setPage('notifications')
   // new input for systolic and diastolic
   // formats the value inside of these inputs
   addBloodPressureInput.on("input", handleSysAndDiaFormat);
@@ -411,12 +495,12 @@ $(() => {
     confirmClearDataModal.fadeIn()
   });
 
-  closeConfirmClearBtn.on('click',(e)=>{
+  closeConfirmClearBtn.on('click', (e) => {
     e.preventDefault()
     modalOverlay.fadeOut()
     confirmClearDataModal.fadeOut()
   })
-  
+
   confirmClearAllDataBtn.on("click", (e) => {
     e.preventDefault()
     // clear user
@@ -502,84 +586,13 @@ $(() => {
     updateUserBirthdayInput.val(globalUser.userBirthday)
   })
 
-  // set and load page
-  const setPage = (title, pageId) => {
-    headerTitle.text(title)
-    if (pageId === 'bloodPressure') {
-      // footer
-      footerTop.show()
 
-      // show section
-      bloodPressureTrackerSection.show()
-      cabinetSection.hide()
-      settingsSection.hide()
-
-      // add and remove classes
-      footerBpTrackerBtn.removeClass('border-zinc-50/0 fill-zinc-950 dark:fill-zinc-50')
-      footerBpTrackerBtn.addClass('border-blue-600 fill-blue-600')
-
-      footerCabinetBtn.addClass('border-zinc-50/0 fill-zinc-950 dark:fill-zinc-50')
-      footerCabinetBtn.removeClass('border-blue-600 fill-blue-600')
-
-      footerSettingsBtn.addClass('border-zinc-50/0 fill-zinc-950 dark:fill-zinc-50')
-      footerSettingsBtn.removeClass('border-blue-600 fill-blue-600')
-    } else if (pageId === 'cabinet') {
-      // footer
-      footerTop.show()
-
-      // show section
-      cabinetSection.show()
-      bloodPressureTrackerSection.hide()
-      settingsSection.hide()
-
-      // add and remove classes
-      footerCabinetBtn.removeClass('border-zinc-50/0 fill-zinc-950 dark:fill-zinc-50')
-      footerCabinetBtn.addClass('border-blue-600 fill-blue-600')
-
-      footerBpTrackerBtn.addClass('border-zinc-50/0 fill-zinc-950 dark:fill-zinc-50')
-      footerBpTrackerBtn.removeClass('border-blue-600 fill-blue-600')
-
-      footerSettingsBtn.addClass('border-zinc-50/0 fill-zinc-950 dark:fill-zinc-50')
-      footerSettingsBtn.removeClass('border-blue-600 fill-blue-600')
-    } else if (pageId === 'settings') {
-      // footer
-      footerTop.hide()
-
-      // show section
-      bloodPressureTrackerSection.hide()
-      cabinetSection.hide()
-      settingsSection.show()
-
-      // add and remove classes
-      footerSettingsBtn.removeClass('border-zinc-50/0 fill-zinc-950 dark:fill-zinc-50')
-      footerSettingsBtn.addClass('border-blue-600 fill-blue-600')
-
-      footerCabinetBtn.addClass('border-zinc-50/0 fill-zinc-950 dark:fill-zinc-50')
-      footerCabinetBtn.removeClass('border-blue-600 fill-blue-600')
-
-      footerBpTrackerBtn.addClass('border-zinc-50/0 fill-zinc-950 dark:fill-zinc-50')
-      footerBpTrackerBtn.removeClass('border-blue-600 fill-blue-600')
-    } else {
-      return
-    }
-  }
-
-
-  footerBpTrackerBtn.click(function () {
-    currentPage = 'bloodPressure'
-    setPage('Blood Pressure Tracker', currentPage)
+  // footer navigation
+  footerBtn.click(function (e) {
+    e.preventDefault()
+    let sectionId = $(this).data().sectionid
+    setPage(sectionId)
   })
-
-  footerCabinetBtn.click(function () {
-    currentPage = 'cabinet'
-    setPage('Cabinet', currentPage)
-  })
-
-  footerSettingsBtn.click(function () {
-    currentPage = 'settings'
-    setPage('Settings', currentPage)
-  })
-
 
   // open edit blood pressure entry
   bloodPressureTrackerSection.on('click', ".blood-pressure-card-btn", function () {
@@ -649,7 +662,7 @@ $(() => {
         addAppAlert('warning', `You have "As needed" selected. Please choose a different schedule to enable refill notifications.`)
       }
 
-      if (addCabinetQtyInput.val() <= 0) {
+      if (addCabinetReceivedQtyInput.val() <= 0) {
         addAppAlert('warning', `Please add a Available Qty if you would like to be notified.`)
       }
 
@@ -666,18 +679,42 @@ $(() => {
     }
   })
 
+
+  // add check for powder
+  addCabinetFormInput.on('input', () => {
+    if (addCabinetFormInput.val() === "Powder" || addCabinetScheduleInput.val() === 'As needed') {
+      toggleCabinetTrackingInputs(false)
+    } else {
+      toggleCabinetTrackingInputs(true)
+    }
+  })
+
+  // add check for as needed
+  addCabinetScheduleInput.on('input', () => {
+    if (addCabinetScheduleInput.val() === 'As needed' || addCabinetFormInput.val() === "Powder") {
+      // hide qty and started date and notify
+      toggleCabinetTrackingInputs(false)
+    } else {
+      toggleCabinetTrackingInputs(true)
+    }
+  })
+
+
+
   // add cabinet item
   addCabinetItemBtn.click(function (e) {
     e.preventDefault()
     let isEditing = currentCabinetCardId !== ""
     let medType = addCabinetTypeInput.val()
+    let medForm = addCabinetFormInput.val()
     let medName = addCabinetNameInput.val()
     let medStrength = addCabinetStrengthInput.val()
+    let medStrengthUnit = addCabinetStrengthUnitInput.val()
     let medAmount = addCabinetAmountInput.val()
-    let medFreq = addCabinetFrequencyInput.val()
     let medSched = addCabinetScheduleInput.val()
     let medNotes = addCabinetNotesInput.val()
-    let medQty = addCabinetQtyInput.val()
+    let medQty = addCabinetReceivedQtyInput.val()
+    let medStartDate = addCabinetStartedInput.val()
     let medNotify = addCabinetNotifyInput.is(':checked')
     let medRefillLink = addCabinetRefillLinkInput.val()
     let medPharmacy = addCabinetPharmacyInput.val()
@@ -707,19 +744,35 @@ $(() => {
     }
 
     if (!isEditing) {
-      let newCabinetItem = new CabinetItem(medType, medName, medStrength, medAmount, medFreq, medSched, medNotes, medQty, medNotify, medRefillLink, medPharmacy)
+      let newCabinetItem = new CabinetItem(
+        medType,
+        medName,
+        medForm,
+        medStrength,
+        medStrengthUnit,
+        medAmount,
+        medSched,
+        medNotes,
+        medQty,
+        medStartDate,
+        medNotify,
+        medRefillLink,
+        medPharmacy,
+      )
       // add item
       globalUser.cabinet_data.push(newCabinetItem)
     } else {
       handleSaveCabinetItem({
         type: medType,
         name: medName,
+        form: medForm,
         strength: medStrength,
+        strengthUnit: medStrengthUnit,
         amount: medAmount,
-        frequency: medFreq,
         schedule: medSched,
         notes: medNotes,
-        daysWorth: medQty,
+        receivedQty: medQty,
+        startDate: medStartDate,
         notifyUser: medNotify,
         refillLink: medRefillLink,
         pharmacy: medPharmacy

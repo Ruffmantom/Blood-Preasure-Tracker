@@ -67,10 +67,11 @@
     <div class="flex justify-between items-center">
       <p class="text-large">Clear All Data</p>
     </div>
-    <p class="text-sm text-center">Are you sure you want to clear all saved data? When cleared, the app will reload and you can then remove this app safely or get started again.</p>
+    <p class="text-sm text-center">Are you sure you want to clear all saved data? When cleared, the app will reload and
+      you can then remove this app safely or get started again.</p>
 
-    <button class="p-3 bg-red-600 text-white w-full text-center rounded-sm"
-      id="confirm-clear-all-data-btn">Yes clear all Data</button>
+    <button class="p-3 bg-red-600 text-white w-full text-center rounded-sm" id="confirm-clear-all-data-btn">Yes clear
+      all Data</button>
     <button class="p-3 bg-zinc-200 dark:bg-zinc-800 text-white w-full text-center rounded-sm"
       id="close-confirm-clear-btn">Cancel</button>
   </div>
@@ -144,14 +145,6 @@
     </div>
     <!-- overflow  -->
     <div id="cabinet-form-overflow" class="flex flex-col gap-3 max-h-[50vh] overflow-y-auto">
-      <div class="flex flex-col gap-1 w-full ">
-        <label for="add-cabinet-type-input">Type</label>
-        <select name="add-cabinet-type-input" id="add-cabinet-type-input"
-          class="w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-sm outline-none">
-          <option value="Medication" selected>Prescription</option>
-          <option value="Supplement">Supplement</option>
-        </select>
-      </div>
 
       <div class="flex flex-col gap-1 w-full ">
         <label for="add-cabinet-name-input">Name</label>
@@ -159,24 +152,70 @@
           id="add-cabinet-name-input" name="add-cabinet-name-input" placeholder="name...">
       </div>
 
-      <div class="flex flex-col gap-1 w-full">
-        <label for="add-cabinet-strength-input">Strength</label>
-        <input class="w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-sm outline-none" type="text"
-          id="add-cabinet-strength-input" name="add-cabinet-strength-input" placeholder="500mg">
+      <div class="flex gap-3 w-full">
+
+        <div class="flex flex-col gap-1 w-full ">
+          <label for="add-cabinet-type-input">Type</label>
+          <select name="add-cabinet-type-input" id="add-cabinet-type-input"
+            class="w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-sm outline-none">
+            <option value="Medication" selected>Prescription</option>
+            <option value="Supplement">Supplement</option>
+          </select>
+        </div>
+
+        <div class="flex flex-col gap-1 w-full ">
+          <label for="add-cabinet-form-input">Form</label>
+          <select name="add-cabinet-form-input" id="add-cabinet-form-input"
+            class="w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-sm outline-none">
+            <option value="Tablet">Tablet</option>
+            <option value="Capsule">Capsule</option>
+            <option value="Softgel">Softgel</option>
+            <option value="Pill">Pill</option>
+            <option value="Powder">Powder</option>
+            <option value="Gummy">Gummy</option>
+            <option value="Chewable">Chewable</option>
+            <option value="Lozenge">Lozenge</option>
+          </select>
+        </div>
+
       </div>
 
-      <div class="flex gap-2 w-full">
-        <div class="flex flex-col gap-1 grow-1">
+      <div class="flex gap-3 w-full">
+
+        <div class="flex flex-col gap-1 w-full">
+          <label for="add-cabinet-strength-input">Strength</label>
+          <input class="w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-sm outline-none" type="number"
+            id="add-cabinet-strength-input" name="add-cabinet-strength-input" placeholder="500...">
+        </div>
+
+        <div class="flex flex-col gap-1 w-full ">
+          <label for="add-cabinet-unit-input">Unit</label>
+          <select name="add-cabinet-unit-input" id="add-cabinet-unit-input"
+            class="w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-sm outline-none">
+            <option value="mg">mg</option>
+            <option value="mcg">mcg</option>
+            <option value="g">g</option>
+            <option value="mg/mL">mg/mL</option>
+            <option value="mcg/mL">mcg/mL</option>
+            <option value="g/mL">g/mL</option>
+            <option value="mg/5mL">mg/5mL</option>
+            <option value="mcg/5mL">mcg/5mL</option>
+            <option value="IU">IU</option>
+            <option value="%">%</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="flex gap-3 w-full">
+
+        <div class="flex flex-col gap-1 w-full">
           <label for="add-cabinet-amount-input">Amount</label>
           <input class="w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-sm outline-none" type="number"
             id="add-cabinet-amount-input" name="add-cabinet-amount-input" placeholder="1">
         </div>
-        <!-- <div class="flex flex-col gap-1 grow-1">
-          <label for="add-cabinet-frequency-input">Frequency</label>
-          <input class="w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-sm outline-none" type="text"
-            id="add-cabinet-frequency-input" name="add-cabinet-frequency-input" placeholder="times...">
-        </div> -->
-        <div class="flex flex-col gap-1 grow-1">
+
+        <div class="flex flex-col gap-1 w-full">
           <label for="add-cabinet-schedule-input">Schedule</label>
           <select name="add-cabinet-schedule-input" id="add-cabinet-schedule-input"
             class="w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-sm outline-none">
@@ -200,16 +239,29 @@
           name="add-cabinet-notes-input" id="add-cabinet-notes-input" placeholder="notes..."></textarea>
       </div>
 
-      <div class="flex flex-col gap-1 w-full">
-        <label for="add-cabinet-qty-input">Available Qty</label>
-        <input class="w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-sm outline-none" type="number"
-          id="add-cabinet-qty-input" name="add-cabinet-qty-input" placeholder="250...">
+      <div id="add-cabinet-item-tracking-qty-and-started-cont" class="flex gap-3 w-full">
+
+        <div class="flex flex-col gap-1 w-full">
+          <label for="add-cabinet-qty-input">Received Qty</label>
+          <input class="w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-sm outline-none" type="number"
+            id="add-cabinet-qty-input" name="add-cabinet-qty-input" placeholder="250...">
+        </div>
+
+        <div class="flex flex-col gap-1 w-full">
+          <label for="add-cabinet-started-input">Started Taking</label>
+          <input class="w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-sm outline-none" type="date"
+            id="add-cabinet-started-input" name="add-cabinet-started-input">
+        </div>
+
       </div>
 
-      <div class="flex gap-3 items-center w-full">
-        <input class="w-5 h-5 bg-zinc-100 dark:bg-zinc-800 " type="checkbox" id="add-cabinet-notify-input"
-          name="add-cabinet-notify-input">
-        <label for="add-cabinet-notify-input">Notify when to refill</label>
+      <div id="add-cabinet-item-tracking-notify-cont" class="flex flex-col gap-2 w-full">
+        <div class="flex gap-3 items-center w-full">
+          <input class="w-5 h-5 bg-zinc-100 dark:bg-zinc-800 " type="checkbox" id="add-cabinet-notify-input"
+            name="add-cabinet-notify-input">
+          <label for="add-cabinet-notify-input">Notify when to refill</label>
+        </div>
+        <p class="text-xs">This option will send a push notification a week before estimated empty.</p>
       </div>
 
       <div class="flex flex-col gap-1 w-full">
@@ -262,22 +314,23 @@
   <div id="content-section" class="p-4 flex flex-col grow-1 overflow-y-auto">
 
     <!-- blood pressure section -->
-    <div id="blood-pressure-tracker-section" class="flex flex-col gap-2">
+    <div id="blood-pressure-tracker-section" class="section-container flex flex-col gap-2">
       <p class="text-center">No data found</p>
       <p class="text-center">You have not added any entries yet</p>
 
     </div>
 
     <!-- cabinet section -->
-    <div style="display: none;" id="cabinet-section" class="flex flex-col gap-2">
+    <div style="display: none;" id="cabinet-section" class="section-container flex flex-col gap-2">
       <p class="text-center">No data found</p>
       <p class="text-center">You have not added any cabinet items yet</p>
     </div>
 
     <!-- settings section -->
-    <div style="display: none;" id="settings-section" class="flex flex-col gap-2">
+    <div style="display: none;" id="settings-section" class="section-container flex flex-col gap-2">
 
       <!-- toggle slider -->
+      <!-- Phased out for now. Low priority -->
       <!-- <div class="flex flex-col gap-1">
         <label for="blood-pressure-input">Theme: <span id="settings-theme-text"></span></label>
         <div id="parent-toggle"
@@ -325,6 +378,11 @@
       <p class="text-xs">App Version: <span id="version">0.0.0</span></p>
     </div>
 
+    <!-- Notifications section -->
+    <div style="display: none;" id="notifications-section" class="section-container flex flex-col gap-2">
+
+    </div>
+
   </div>
 
   <!-- footer section -->
@@ -333,13 +391,15 @@
       <button id="footer-add-btn"
         class="rounded-full w-max p-5 flex items-center justify-center bg-blue-600 fill-white"></button>
     </div>
-    <div class="footer-bottom flex gap-12 justify-center items-center">
-      <button id="footer-bp-tracker-btn"
-        class="w-12 h-12 p-0 flex items-center justify-center border-b-2 border-blue-600 fill-blue-600"></button>
-      <button id="footer-cabinet-btn"
-        class="w-12 h-12 p-0 flex items-center justify-center border-b-2 dark:fill-zinc-50 border-zinc-50/0"></button>
-      <button id="footer-settings-btn"
-        class="w-12 h-12 p-0 flex items-center justify-center border-b-2 dark:fill-zinc-50 border-zinc-50/0"></button>
+    <div class="footer-bottom flex gap-10 justify-center items-center">
+      <button data-sectionid="bloodPressure" id="footer-bp-tracker-btn"
+        class="footer-btn w-12 h-12 p-0 flex items-center justify-center border-b-2 border-blue-600 fill-blue-600"></button>
+      <button data-sectionid="cabinet" id="footer-cabinet-btn"
+        class="footer-btn w-12 h-12 p-0 flex items-center justify-center border-b-2 dark:fill-zinc-50 border-zinc-50/0"></button>
+      <button data-sectionid="settings" id="footer-settings-btn"
+        class="footer-btn w-12 h-12 p-0 flex items-center justify-center border-b-2 dark:fill-zinc-50 border-zinc-50/0"></button>
+      <button data-sectionid="notifications" id="footer-notifications-btn"
+        class="footer-btn w-12 h-12 p-0 flex items-center justify-center border-b-2 dark:fill-zinc-50 border-zinc-50/0"></button>
     </div>
   </div>
 

@@ -63,6 +63,20 @@ const cabinetItemComponent = (data) => {
     */
   }
 
+  const formatForm = () => {
+    if (data.dose.value >= 2 && data.form !== 'Powder') {
+      return `${data.form}s`
+    } else if (data.form === 'Powder') {
+      if (data.dose.value >= 2) {
+        return 'scoops'
+      } else {
+        return 'scoop'
+      }
+    } else {
+      return data.form
+    }
+  }
+
   return `
     <div class="relative flex flex-col gap-2 p-3 rounded-md bg-zinc-50 border-1 border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-50">
       <div class="relative flex flex-col gap-2">
@@ -74,15 +88,35 @@ const cabinetItemComponent = (data) => {
           </div>
           ${data.notifyUser ? `<p class="text-xs text-green-600">Refill reminder</p>` : ""}
         </div>
-        <p class="text-xl font-bold">${data.name} - ${data.strength}</p>
-        <p class="text-sm">Take ${data.amount} - ${data.frequency ? `${data.frequency} times` : ""} ${data.schedule}</p>
+        <p class="text-xl font-bold">${data.name} - ${data.strength.value}${data.strength.unit}</p>
+        <p class="text-sm">Taking ${data.dose.value} ${formatForm()} ${data.dose.schedule}</p>
         ${data.pharmacy ? `<p class="text-sm">Pharmacy: ${data.pharmacy}</p>` : ""}
         ${data.notes ? `<p class="text-sm">"${data.notes}"</p>` : ""}
         ${data.needsRefill ? `<p class="text-xs italic">Estimated ${data.daysWorth} left</p>` : ""}
       </div>
-      ${data.refillLink ? `<a href="${data.refillLink}" target="_blank" class="p-3 bg-zinc-200 dark:bg-zinc-800 text-white w-full text-center rounded-sm">Refill Link</a>` : ""}
+      ${data.refillLink ? `<a href="${data.refillLink}" target="_blank" class="p-3 bg-zinc-200 dark:bg-zinc-800 dark:text-white text-zinc-950 w-full text-center rounded-sm">Refill Link</a>` : ""}
       ${data.needsRefill ? `<button data-itemid="${data.id}" target="_blank" class="cabinet-item-reset-refill-btn p-3 bg-blue-600 text-white w-full text-center rounded-sm">Reset Refill</button>` : ""}
     </div>
+  
+  `
+}
+
+
+const notificationItemComponent = (data) => {
+
+  return `
+      <div class="flex flex-col gap-3 p-3 rounded-md bg-zinc-50 dark:bg-zinc-900 dark:text-zinc-50 relative border-1 ${data.read ? "border-zinc-200 dark:border-zinc-800" : "border-blue-600"}">
+       
+      ${data.read ? "" : `<div class="bg-blue-600 absolute top-[-4px] right-[-4px] rounded-full h-4 w-4"></div>`}
+
+        <div class="flex flex-col gap-2 relative">
+          <div data-notificationid="" class="notification-btn absolute z-[2] top-0 left-0 w-full"></div>
+          <p class=" text-base font-medium">Time to refill!</p>
+          <p class="text-sm font-light">It looks like your labetalol 200mg is almost out and ready for a refill. be sure to contact your pharmacy to see if it is ready.</p>
+        </div>
+        <a href="#" class="p-3 bg-blue-600 text-white w-full text-center rounded-sm">Refill Now</a>
+        <p class="text-xs">03/19/2026 : 10:31 am</p>
+      </div>
   
   `
 }
