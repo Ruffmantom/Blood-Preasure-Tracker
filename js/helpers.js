@@ -11,10 +11,25 @@ function generateBPId() {
   return randomId;
 }
 
-const returnIsoString = () => {
-  const now = new Date();
-  const isoTime = now.toISOString();
-  return isoTime
+const returnIsoString = (includeYesterday = false, includeLastWeek = false, isoOnly = false) => {
+  const date = new Date();
+  if (includeYesterday) {
+    date.setDate(date.getDate() - 1);
+  }
+
+  if (includeLastWeek) {
+    date.setDate(date.getDate() - 7);
+  }
+
+  if (isoOnly) {
+    return date.toISOString()
+  }
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
 }
 
 const handleSysAndDiaFormat = function () {
@@ -39,7 +54,7 @@ const handleSysAndDiaFormat = function () {
   this.setSelectionRange(cursorPos, cursorPos);
 }
 
-function formatDate(isoDateString) {
+function formatDate(isoDateString, includeTime = true) {
   const date = new Date(isoDateString);
 
   // Pad with leading zeros where necessary
@@ -60,9 +75,14 @@ function formatDate(isoDateString) {
   hour = hour ? hour : 12; // the hour '0' should be '12'
 
   // Construct formatted date string
-  const formattedDate = `${month}/${day}/${year} : ${pad(
-    hour
-  )}:${minute} ${ampm}`;
+  let formattedDate = ""
+  if (includeTime) {
+    formattedDate = `${month}/${day}/${year} : ${pad(
+      hour
+    )}:${minute} ${ampm}`;
+  } else {
+    formattedDate = `${month}/${day}/${year}`;
+  }
 
   return formattedDate;
 }
@@ -123,8 +143,8 @@ function downloadTxt(data, filename = "data.txt") {
   let stringData = "";
   data.forEach((d) => {
     const note = String(d.notes).replace(/\r?\n/g, " ") || ""
-    stringData += `• ${formatDate(d.createdAt)} - (${d.systolic}/${d.diastolic}) ${d.pulse ? `| Pulse rate: ${d.pulse}`:""} ${d?.notes ? note : ""}\n`;
-  }); 
+    stringData += `• ${formatDate(d.createdAt)} - (${d.systolic}/${d.diastolic}) ${d.pulse ? `| Pulse rate: ${d.pulse}` : ""} ${d?.notes ? note : ""}\n`;
+  });
 
   // Create a plain-text blob and trigger download
   const blob = new Blob([stringData], { type: "text/plain;charset=utf-8" });
@@ -159,40 +179,6 @@ const returnBpCategoryClass = (cat) => {
       break;
   }
   return className
-}
-
-const clearDataModal = () => {
-  // reset
-  $("#overlay_record_index").text("")
-  $("#modal_top_num").text("")
-  $("#modal_bot_num").text("")
-  $("#overlay_note_input").val()
-  $("#overlay_record_date").text("")
-  $("#modal_bp_category").text("")
-  $("#modal_bp_category").text("")
-  $("#modal_bp_category").removeClass("danger")
-  $("#modal_bp_category").removeClass("normal")
-  $("#modal_bp_category").removeClass("caution")
-  $("#save_record_btn").attr('recordid', "")
-  $("#delete_record_btn").attr('recordid', "")
-}
-const setDataModal = (data) => {
-  clearDataModal()
-  // set elements
-  $("#overlay_record_index").text(data._id)
-  $("#modal_top_num").text(data.topNum)
-  $("#modal_bot_num").text(data.bottomNum)
-  $("#overlay_note_input").val(data.note)
-  $("#overlay_record_date").text(formatDate(data.recordedAt))
-  let category = categorizeBloodPressure(data, globalUser.userAge)
-  let categoryClass = returnBpCategoryClass(category)
-
-  $("#modal_bp_category").text(category)
-  $("#modal_bp_category").addClass(categoryClass)
-  // set save and delete btn ids
-  $("#save_record_btn").attr('recordid', data._id)
-  $("#delete_record_btn").attr('recordid', data._id)
-
 }
 
 function getAgeFromDateInput(dateValue) {
@@ -285,10 +271,23 @@ function isPrivateIPv4(hostname) {
 }
 
 
-const returnRefillDate = (qty = 0, amount = 0, schedule = 'Daily') => {
-  const currentDate = new Date();
+const returnRefillDate = (
+  dateStarted = '',
+  receivedQty = 0,
+  doseAmount = 0,
+  schedule = 'Daily'
+) => {
+  const baseDate = dateStarted ? new Date(dateStarted) : new Date();
 
-  if (!qty || !amount || qty <= 0 || amount <= 0) return null;
+  if (
+    Number.isNaN(baseDate.getTime()) ||
+    !receivedQty ||
+    !doseAmount ||
+    receivedQty <= 0 ||
+    doseAmount <= 0
+  ) {
+    return null;
+  }
 
   const scheduleMap = {
     'Daily': 1,
@@ -303,12 +302,12 @@ const returnRefillDate = (qty = 0, amount = 0, schedule = 'Daily') => {
   };
 
   const dosesPerDay = scheduleMap[schedule] ?? 1;
-  const amountPerDay = amount * dosesPerDay;
-  const daysUntilEmpty = qty / amountPerDay;
-  const notifyDaysFromNow = Math.max(0, Math.floor(daysUntilEmpty - 7));
+  const amountPerDay = doseAmount * dosesPerDay;
+  const daysUntilEmpty = receivedQty / amountPerDay;
+  const notifyDaysFromStart = Math.max(0, Math.floor(daysUntilEmpty - 7));
 
-  const notifyUserDate = new Date(currentDate);
-  notifyUserDate.setDate(notifyUserDate.getDate() + notifyDaysFromNow);
+  const notifyUserDate = new Date(baseDate);
+  notifyUserDate.setDate(notifyUserDate.getDate() + notifyDaysFromStart);
 
   const year = notifyUserDate.getFullYear();
   const month = String(notifyUserDate.getMonth() + 1).padStart(2, '0');
@@ -327,13 +326,88 @@ const getTodayString = () => {
 };
 
 
-const sendNotification = (tag = "", message = "") => {
+const sendNotification = (tag = "", title = "", message = "",globalUser = null) => {
   Notification.requestPermission(perm => {
-    if (perm) {
-      new Notification(message, {
+    if (perm && globalUser.allow_notifications) {
+      new Notification(title, {
         tag: tag || undefined,
+        body: message,
         icon: "./assets/images/bp-tracker-rounded-256.png"
       })
     }
   })
+}
+
+function launchConfettiBurst(options = {}) {
+  const settings = {
+    count: options.count || 50,
+    originX: window.innerWidth / 2,
+    originY: window.innerHeight - 10,
+    gravity: options.gravity || 0.25,
+    colors: options.colors || ['#ef476f', '#ffd166', '#06d6a0', '#118ab2', '#8338ec', '#ff9f1c']
+  };
+
+  const $layer = $('.confetti-layer');
+
+  for (let i = 0; i < settings.count; i++) {
+    const width = Math.random() * 10 + 5;
+    const height = Math.random() * 6 + 4;
+    const color = settings.colors[Math.floor(Math.random() * settings.colors.length)];
+    const shapeType = Math.floor(Math.random() * 3);
+
+    const $piece = $('<div class="confetti-piece"></div>');
+    $piece.css({
+      width: `${width}px`,
+      height: `${height}px`,
+      background: color,
+      borderRadius: shapeType === 0 ? '50%' : '2px',
+      left: 0,
+      top: 0
+    });
+
+    $layer.append($piece);
+
+    let x = settings.originX;
+    let y = settings.originY;
+
+    // wider burst shape
+    let angle = (-Math.PI / 2) + ((Math.random() - 0.5) * 1.4);
+    let speed = Math.random() * 7 + 8;
+
+    let vx = Math.cos(angle) * speed;
+    let vy = Math.sin(angle) * speed;
+
+    let rotate = Math.random() * 360;
+    let rotateSpeed = (Math.random() - 0.5) * 25;
+    let opacity = 1;
+
+    function frame() {
+      vy += settings.gravity;
+      x += vx;
+      y += vy;
+      rotate += rotateSpeed;
+
+      if (y > window.innerHeight * 0.7) {
+        opacity -= 0.02;
+      }
+
+      $piece.css({
+        transform: `translate(${x}px, ${y}px) rotate(${rotate}deg)`,
+        opacity: Math.max(opacity, 0)
+      });
+
+      if (y < window.innerHeight + 50 && opacity > 0) {
+        requestAnimationFrame(frame);
+      } else {
+        $piece.remove();
+      }
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  // to use it
+  /*
+  launchConfettiBurst({ count: 140 });
+  */
 }

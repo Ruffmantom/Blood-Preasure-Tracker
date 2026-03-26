@@ -1,8 +1,6 @@
 // variables
 let appVersion = "2.0.4";
 const localUserId = 'O1LHQAMLTTIUVI2USHPGZOKKAJOVU4PCCBKF26Q7ZRNNHK496PPOV9THXRRGXEKH7T6M8WDXNKYLIDSWHQFMMSPWHCRLBPJKJ4YM'
-// pages are bloodPressure, cabinet, settings
-let currentPage = 'bloodPressure'
 
 // State
 let globalUser = null;
@@ -11,6 +9,8 @@ let activeModalDataNote = ""
 let activeModalDataId = ""
 let currentBloodPressureCardId = ''
 let currentCabinetCardId = ''
+// pages are bloodPressure, cabinet, settings
+let currentAppSection = 'bloodPressure'
 const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
 const defaultUser = {
     userAge: "",
@@ -20,7 +20,9 @@ const defaultUser = {
     cabinet_data: [],
     userStatus: "setup",
     allow_notifications: false,
-    notification_log: []
+    has_created_first_reading:false,
+    notification_log: [],
+    app_notifications: []
 };
 
 
@@ -37,6 +39,10 @@ const settingsUsersAge = $("#settings-users-age")
 const addEditCabinetFormTitle = $("#add-edit-cabinet-form-title")
 const cabinetFormOverflow = $("#cabinet-form-overflow")
 const settingsNotifyTakeBpTimeBlock = $("#settings-notify-take-bp-time-block")
+const addCabinetItemTrackingQtyAndStartedCont = $("#add-cabinet-item-tracking-qty-and-started-cont")
+const addCabinetItemTrackingNotifyCont = $("#add-cabinet-item-tracking-notify-cont")
+const notificationCheckMark = $("#notification-check-mark")
+const footerNotificationBtnPing = $("#footer-notification-btn-ping")
 
 // inputs
 const addBloodPressureInput = $("#add-blood-pressure-input")
@@ -47,14 +53,16 @@ const editBloodPressurePulseInput = $("#edit-blood-pressure-pulse-input")
 const editBloodPressureNotesInput = $("#edit-blood-pressure-notes-input")
 const userBirthdayInput = $("#user-birthday")
 
-const addCabinetTypeInput = $('#add-cabinet-type-input')
 const addCabinetNameInput = $('#add-cabinet-name-input')
+const addCabinetTypeInput = $('#add-cabinet-type-input')
+const addCabinetFormInput = $('#add-cabinet-form-input')
 const addCabinetStrengthInput = $('#add-cabinet-strength-input')
+const addCabinetStrengthUnitInput = $('#add-cabinet-unit-input')
 const addCabinetAmountInput = $('#add-cabinet-amount-input')
-const addCabinetFrequencyInput = $('#add-cabinet-frequency-input')
 const addCabinetScheduleInput = $('#add-cabinet-schedule-input')
 const addCabinetNotesInput = $('#add-cabinet-notes-input')
-const addCabinetQtyInput = $('#add-cabinet-qty-input')
+const addCabinetReceivedQtyInput = $('#add-cabinet-qty-input')
+const addCabinetStartedInput = $('#add-cabinet-started-input')
 const addCabinetNotifyInput = $('#add-cabinet-notify-input')
 const addCabinetRefillLinkInput = $('#add-cabinet-refill-link-input')
 const addCabinetPharmacyInput = $('#add-cabinet-pharmacy-input')
@@ -69,13 +77,14 @@ const settingsNotifyTakeBpTimeInput = $("#settings-notify-take-bp-time-input")
 const bloodPressureTrackerSection = $("#blood-pressure-tracker-section")
 const cabinetSection = $("#cabinet-section")
 const settingsSection = $("#settings-section")
+const notificationsSection = $("#notifications-section")
 
 // modals
 const loadingOverlay = $("#loading-overlay")
 const modalOverlay = $("#overlay")
 const addBpEntryModal = $("#add-bp-entry-modal")
 const editBpEntryModal = $("#edit-bp-entry-modal")
-const notificationContainer = $("#notification-container")
+const appAlertContainer = $("#alert-container")
 const welcomeOverlay = $("#welcome-overlay")
 const addCabinetItemModal = $("#add-cabinet-item-modal")
 const changeAgeModal = $('#change-age-modal')
@@ -85,6 +94,7 @@ const confirmClearDataModal = $("#confirm-clear-data-modal")
 const footerBpTrackerBtn = $('#footer-bp-tracker-btn')
 const footerCabinetBtn = $('#footer-cabinet-btn')
 const footerSettingsBtn = $('#footer-settings-btn')
+const footerNotificationsBtn = $('#footer-notifications-btn')
 const footerAddBtn = $('#footer-add-btn')
 const closeAddEntryBtn = $('#close-add-entry-btn')
 const closeEditEntryBtn = $('#close-edit-entry-btn')
@@ -103,7 +113,8 @@ const addCabinetItemBtn = $('#add-cabinet-item-btn')
 const deleteCabinetItemBtn = $('#delete-cabinet-item-btn')
 const closeConfirmClearBtn = $("#close-confirm-clear-btn")
 const confirmClearAllDataBtn = $("#confirm-clear-all-data-btn")
-
+const footerBtn = $('.footer-btn')
+const notificationsMarkAllReadBtn = $('#notifications-mark-all-read-btn')
 // toggle
 const themeToggleHandlerBtn = $('#theme-toggle-handler-btn')
 const parentToggle = $('#parent-toggle')
@@ -129,7 +140,7 @@ class BloodPressureEntry {
         this.pulse = pulse
         this.notes = notes || ""
         this.updatedAt = ""
-        this.createdAt = returnIsoString()
+        this.createdAt = returnIsoString(false,false,true)
     }
     returnId() {
         return this.id
@@ -140,36 +151,64 @@ class CabinetItem {
     constructor(
         type = "Prescriptions",
         name = "",
-        strength = "",
+        form = "pill",
+        strength = 0,
+        strengthUnit = "mg",
         amount = 0,
-        frequency = 0,
         schedule = "Daily",
         notes = "",
-        daysWorth = 0,
+        receivedQty = 0,
+        dateStarted = "",
         notifyUser = false,
         refillLink = "",
         pharmacy = ""
     ) {
         this.id = generateBPId()
-        this.type = type
         this.name = name
-        this.strength = strength
-        this.amount = amount
-        this.frequency = frequency // this is to be phased out...
-        this.schedule = schedule
+        this.type = type
+        this.form = form
+        this.strength = {
+            value: strength,
+            unit: strengthUnit
+        }
+        this.dose = {
+            value: amount,
+            schedule: schedule
+        }
         this.notes = notes
-        this.daysWorth = daysWorth
-        this.originalQty = daysWorth
-        this.notifyUser = notifyUser
+        this.tracking = {
+            startDate: dateStarted,
+            startQty: receivedQty, // reset refill will override this
+            refillReminderBy: returnRefillDate(dateStarted, receivedQty, amount, schedule)
+        }
         this.refillLink = refillLink
         this.pharmacy = pharmacy
-        this.updatedAt = ""
-        this.notifyDate = returnRefillDate(daysWorth,amount,schedule)
-        this.needsRefill = false
-        this.createdAt = returnIsoString()
+        this.notifyUser = notifyUser
+        this.needsRefill = false // this is to render the refill btn on the card
+        this.createdAt = returnIsoString(false,false,true)
     }
     returnId() {
         return this.id
+    }
+}
+
+class AppNotifications {
+    constructor(
+        tag = "",
+        title = "",
+        message = "",
+        link = "",
+        linkLabel = "",
+    ) {
+        this.id = generateBPId()
+        this.tag = tag
+        this.title = title
+        this.message = message
+        this.read = false
+        this.link = link
+        this.linkLabel = linkLabel
+        this.createdAt = returnIsoString(false,false,true)
+        this.status = 'viewable'
     }
 }
 
@@ -187,9 +226,11 @@ closeBtnsArr.forEach(elm => {
 footerBpTrackerBtn.html(bloodPressure())
 footerCabinetBtn.html(medications())
 footerSettingsBtn.html(settings())
+footerNotificationsBtn.html(bell())
 footerAddBtn.html(add())
 loadingOverlayLogo.html(digitalLogo())
 welcomeLogo.html(digitalLogo())
+notificationCheckMark.html(check())
 
 
 
