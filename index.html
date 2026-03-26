@@ -21,8 +21,8 @@
 </head>
 
 <body id="main_body" class="max-w-lg m-auto flex flex-col gap-0 h-screen relative  dark:bg-zinc-950 dark:text-zinc-50">
-  <!-- test notification -->
-  <div id="notification-container" class="absolute top-0 left-0 w-full h-max p-3 flex flex-col gap-2">
+  <!-- alert container -->
+  <div id="alert-container" class="absolute top-0 left-0 w-full h-max p-3 flex flex-col gap-2">
   </div>
   <!-- overlay -->
   <div id="overlay" style="display: none;" class="absolute bg-zinc-950/15 w-full h-full z-10 backdrop-blur-xs"></div>
@@ -60,6 +60,7 @@
       </div>
     </div>
   </div>
+
 
   <!-- Confirm Delete All Data -->
   <div id="confirm-clear-data-modal" style="display: none;"
@@ -309,7 +310,9 @@
   <div id="header-section" class="p-4 pt-12 flex justify-between items-center">
     <p class="text-lg font-medium" id="header-title">Blood Pressure Tracker</p>
     <div id="header-btn-section" class="">
-      <button style="display: none;" id="notifications-mark-all-read-btn" class="flex gap-1 items-center px-1 text-xs"><span id="notification-check-mark" class="dark:fill-zinc-50 fill-zinc-950"></span>Mark all as read</button>
+      <button style="display: none;" id="notifications-mark-all-read-btn"
+        class="flex gap-1 items-center px-1 text-xs"><span id="notification-check-mark"
+          class="dark:fill-zinc-50 fill-zinc-950"></span>Mark all as read</button>
     </div>
   </div>
 
@@ -347,7 +350,7 @@
       <div class="flex flex-col gap-2 w-full">
         <div class="flex gap-2">
           <input class="w-5 h-5 bg-zinc-100 dark:bg-zinc-800 " type="checkbox" id="settings-allow-notify-input"
-          name="settings-allow-notify-input">
+            name="settings-allow-notify-input">
           <label for="settings-allow-notify-input">Allow push notifications</label>
         </div>
         <p class="text-xs">Notifications that will be sent to your phone.</p>
@@ -396,15 +399,24 @@
       <button id="footer-add-btn"
         class="rounded-full w-max p-5 flex items-center justify-center bg-blue-600 fill-white"></button>
     </div>
-    <div class="footer-bottom flex gap-10 justify-center items-center">
+    <div class="footer-bottom flex gap-8 justify-center items-center">
       <button data-sectionid="bloodPressure" id="footer-bp-tracker-btn"
         class="footer-btn w-12 h-12 p-0 flex items-center justify-center border-b-2 border-blue-600 fill-blue-600"></button>
       <button data-sectionid="cabinet" id="footer-cabinet-btn"
         class="footer-btn w-12 h-12 p-0 flex items-center justify-center border-b-2 dark:fill-zinc-50 border-zinc-50/0"></button>
       <button data-sectionid="settings" id="footer-settings-btn"
         class="footer-btn w-12 h-12 p-0 flex items-center justify-center border-b-2 dark:fill-zinc-50 border-zinc-50/0"></button>
-      <button data-sectionid="notifications" id="footer-notifications-btn"
-        class="footer-btn w-12 h-12 p-0 flex items-center justify-center border-b-2 dark:fill-zinc-50 border-zinc-50/0"></button>
+
+      <div class="relative">
+        <div style="display: none;" class="absolute top-2 right-2" id="footer-notification-btn-ping">
+          <div class="w-2 h-2 absolute
+top-0 right-0 rounded-full bg-blue-600 animate-ping"></div>
+          <div class="w-2 h-2 absolute z-[2] top-0 right-0 rounded-full bg-blue-600">
+          </div>
+        </div>
+        <button data-sectionid="notifications" id="footer-notifications-btn"
+          class="footer-btn w-12 h-12 p-0 flex items-center justify-center border-b-2 dark:fill-zinc-50 border-zinc-50/0"></button>
+      </div>
     </div>
   </div>
 

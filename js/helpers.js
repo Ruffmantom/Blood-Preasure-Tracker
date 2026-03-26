@@ -11,11 +11,18 @@ function generateBPId() {
   return randomId;
 }
 
-const returnIsoString = (includeYesterday = false) => {
+const returnIsoString = (includeYesterday = false, includeLastWeek = false, isoOnly = false) => {
   const date = new Date();
-
   if (includeYesterday) {
     date.setDate(date.getDate() - 1);
+  }
+
+  if (includeLastWeek) {
+    date.setDate(date.getDate() - 7);
+  }
+
+  if (isoOnly) {
+    return date.toISOString()
   }
 
   const year = date.getFullYear();
@@ -47,7 +54,7 @@ const handleSysAndDiaFormat = function () {
   this.setSelectionRange(cursorPos, cursorPos);
 }
 
-function formatDate(isoDateString) {
+function formatDate(isoDateString, includeTime = true) {
   const date = new Date(isoDateString);
 
   // Pad with leading zeros where necessary
@@ -68,9 +75,14 @@ function formatDate(isoDateString) {
   hour = hour ? hour : 12; // the hour '0' should be '12'
 
   // Construct formatted date string
-  const formattedDate = `${month}/${day}/${year} : ${pad(
-    hour
-  )}:${minute} ${ampm}`;
+  let formattedDate = ""
+  if (includeTime) {
+    formattedDate = `${month}/${day}/${year} : ${pad(
+      hour
+    )}:${minute} ${ampm}`;
+  } else {
+    formattedDate = `${month}/${day}/${year}`;
+  }
 
   return formattedDate;
 }
@@ -314,9 +326,9 @@ const getTodayString = () => {
 };
 
 
-const sendNotification = (tag = "", title = "", message = "") => {
+const sendNotification = (tag = "", title = "", message = "",globalUser = null) => {
   Notification.requestPermission(perm => {
-    if (perm) {
+    if (perm && globalUser.allow_notifications) {
       new Notification(title, {
         tag: tag || undefined,
         body: message,
@@ -324,4 +336,78 @@ const sendNotification = (tag = "", title = "", message = "") => {
       })
     }
   })
+}
+
+function launchConfettiBurst(options = {}) {
+  const settings = {
+    count: options.count || 50,
+    originX: window.innerWidth / 2,
+    originY: window.innerHeight - 10,
+    gravity: options.gravity || 0.25,
+    colors: options.colors || ['#ef476f', '#ffd166', '#06d6a0', '#118ab2', '#8338ec', '#ff9f1c']
+  };
+
+  const $layer = $('.confetti-layer');
+
+  for (let i = 0; i < settings.count; i++) {
+    const width = Math.random() * 10 + 5;
+    const height = Math.random() * 6 + 4;
+    const color = settings.colors[Math.floor(Math.random() * settings.colors.length)];
+    const shapeType = Math.floor(Math.random() * 3);
+
+    const $piece = $('<div class="confetti-piece"></div>');
+    $piece.css({
+      width: `${width}px`,
+      height: `${height}px`,
+      background: color,
+      borderRadius: shapeType === 0 ? '50%' : '2px',
+      left: 0,
+      top: 0
+    });
+
+    $layer.append($piece);
+
+    let x = settings.originX;
+    let y = settings.originY;
+
+    // wider burst shape
+    let angle = (-Math.PI / 2) + ((Math.random() - 0.5) * 1.4);
+    let speed = Math.random() * 7 + 8;
+
+    let vx = Math.cos(angle) * speed;
+    let vy = Math.sin(angle) * speed;
+
+    let rotate = Math.random() * 360;
+    let rotateSpeed = (Math.random() - 0.5) * 25;
+    let opacity = 1;
+
+    function frame() {
+      vy += settings.gravity;
+      x += vx;
+      y += vy;
+      rotate += rotateSpeed;
+
+      if (y > window.innerHeight * 0.7) {
+        opacity -= 0.02;
+      }
+
+      $piece.css({
+        transform: `translate(${x}px, ${y}px) rotate(${rotate}deg)`,
+        opacity: Math.max(opacity, 0)
+      });
+
+      if (y < window.innerHeight + 50 && opacity > 0) {
+        requestAnimationFrame(frame);
+      } else {
+        $piece.remove();
+      }
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  // to use it
+  /*
+  launchConfettiBurst({ count: 140 });
+  */
 }

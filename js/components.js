@@ -105,17 +105,20 @@ const cabinetItemComponent = (data) => {
 const notificationItemComponent = (data) => {
 
   return `
-      <div class="flex flex-col gap-3 p-3 rounded-md bg-zinc-50 dark:bg-zinc-900 dark:text-zinc-50 relative border-1 ${data.read ? "border-zinc-200 dark:border-zinc-800" : "border-blue-600"}">
+      <div class="flex flex-col gap-3 p-3 rounded-md bg-zinc-50 dark:bg-zinc-900 dark:text-zinc-50 relative border-1 ${data.read ? "border-zinc-200 dark:border-zinc-800 " : "border-blue-600 "}">
        
-      ${data.read ? "" : `<div class="bg-blue-600 absolute top-[-4px] right-[-4px] rounded-full h-4 w-4"></div>`}
+      ${data.read ? "" : `
+        <div class="bg-blue-600 absolute top-[-4px] right-[-4px] rounded-full h-4 w-4"></div>
+        <div class="bg-blue-600 absolute top-[-4px] right-[-4px] rounded-full h-4 w-4 animate-ping"></div>
+        `}
 
-        <div class="flex flex-col gap-2 relative">
+        <div class="flex flex-col gap-2 relative ${data.read ? "opacity-70" : " opacity-100"}">
           <div data-notificationid=${data.id} class="notification-btn absolute z-[2] top-0 left-0 w-full h-full"></div>
           <p class=" text-base font-medium">${data.title}</p>
           <p class="text-sm font-light">${data.message}</p>
         </div>
-        ${data.link ? `<a href="${data.link}" class="p-3 bg-blue-600 text-white w-full text-center rounded-sm">Refill Now</a>` : ""}
-        <p class="text-xs">${formatDate(data.createdAt)}</p>
+        ${data.link ? `<a href="${data.link}" class="p-3 bg-blue-600 text-white w-full text-center rounded-sm">${data.linkLabel ? data.linkLabel : "Refill Now"}</a>` : ""}
+        <p class="text-xs">${formatDate(data.createdAt, false)}</p>
       </div>
   
   `

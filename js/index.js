@@ -1,8 +1,6 @@
 // variables
 let appVersion = "2.0.4";
 const localUserId = 'O1LHQAMLTTIUVI2USHPGZOKKAJOVU4PCCBKF26Q7ZRNNHK496PPOV9THXRRGXEKH7T6M8WDXNKYLIDSWHQFMMSPWHCRLBPJKJ4YM'
-// pages are bloodPressure, cabinet, settings
-let currentPage = 'bloodPressure'
 
 // State
 let globalUser = null;
@@ -11,6 +9,8 @@ let activeModalDataNote = ""
 let activeModalDataId = ""
 let currentBloodPressureCardId = ''
 let currentCabinetCardId = ''
+// pages are bloodPressure, cabinet, settings
+let currentAppSection = 'bloodPressure'
 const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
 const defaultUser = {
     userAge: "",
@@ -20,6 +20,7 @@ const defaultUser = {
     cabinet_data: [],
     userStatus: "setup",
     allow_notifications: false,
+    has_created_first_reading:false,
     notification_log: [],
     app_notifications: []
 };
@@ -41,6 +42,7 @@ const settingsNotifyTakeBpTimeBlock = $("#settings-notify-take-bp-time-block")
 const addCabinetItemTrackingQtyAndStartedCont = $("#add-cabinet-item-tracking-qty-and-started-cont")
 const addCabinetItemTrackingNotifyCont = $("#add-cabinet-item-tracking-notify-cont")
 const notificationCheckMark = $("#notification-check-mark")
+const footerNotificationBtnPing = $("#footer-notification-btn-ping")
 
 // inputs
 const addBloodPressureInput = $("#add-blood-pressure-input")
@@ -82,7 +84,7 @@ const loadingOverlay = $("#loading-overlay")
 const modalOverlay = $("#overlay")
 const addBpEntryModal = $("#add-bp-entry-modal")
 const editBpEntryModal = $("#edit-bp-entry-modal")
-const notificationContainer = $("#notification-container")
+const appAlertContainer = $("#alert-container")
 const welcomeOverlay = $("#welcome-overlay")
 const addCabinetItemModal = $("#add-cabinet-item-modal")
 const changeAgeModal = $('#change-age-modal')
@@ -138,7 +140,7 @@ class BloodPressureEntry {
         this.pulse = pulse
         this.notes = notes || ""
         this.updatedAt = ""
-        this.createdAt = returnIsoString()
+        this.createdAt = returnIsoString(false,false,true)
     }
     returnId() {
         return this.id
@@ -183,7 +185,7 @@ class CabinetItem {
         this.pharmacy = pharmacy
         this.notifyUser = notifyUser
         this.needsRefill = false // this is to render the refill btn on the card
-        this.createdAt = returnIsoString()
+        this.createdAt = returnIsoString(false,false,true)
     }
     returnId() {
         return this.id
@@ -196,6 +198,7 @@ class AppNotifications {
         title = "",
         message = "",
         link = "",
+        linkLabel = "",
     ) {
         this.id = generateBPId()
         this.tag = tag
@@ -203,7 +206,9 @@ class AppNotifications {
         this.message = message
         this.read = false
         this.link = link
-        this.createdAt = returnIsoString()
+        this.linkLabel = linkLabel
+        this.createdAt = returnIsoString(false,false,true)
+        this.status = 'viewable'
     }
 }
 

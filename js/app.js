@@ -20,16 +20,13 @@ const renderCards = () => {
 
 // checking refill status
 const checkUserRefills = () => {
-  console.log('checking refills')
   // check notifyDates for cabinet items and notify user of any that have a date of today or past.
   let today = getTodayString()
   globalUser.cabinet_data.forEach(item => {
     if (!item.notifyUser) {
-      console.log('Skipping item...')
       return
     }
     // check if notification had already been sent
-    console.log('Checking item...')
     if (item.needsRefill || item.tracking.refillReminderBy <= today) {
       let foundLog = globalUser.notification_log.find(l => l.date === today && l.tag === item.name)
       // set needsRefill
@@ -37,7 +34,7 @@ const checkUserRefills = () => {
       // notify user if have not already
       if (!foundLog) {
         let message = `Time to refill your ${item.name} - ${item.strength.value} ${item.strength.unit}.`
-        sendNotification(item.name, "Refill reminder", message)
+        sendNotification(item.name, "Refill reminder", message, globalUser)
         // create app notification
         let newAppNotification = new AppNotifications(item.name, "Refill reminder", message)
         // push new notification
@@ -99,43 +96,62 @@ const renderAppNotifications = () => {
   let num = 0
   globalUser.app_notifications.forEach(n => {
     if (!n.read) {
-      num + 1
+      num++
     }
   })
-  if (num >= 2) {
+
+  if (num >= 2 && currentAppSection === "notifications") {
     // show mark all as read btn
     notificationsMarkAllReadBtn.show()
   }
+
+  // render the footer button
+  if (num >= 1) {
+    footerNotificationBtnPing.show()
+  } else {
+    footerNotificationBtnPing.hide()
+  }
+
   if (globalUser.app_notifications.length >= 1) {
     let todaysIso = returnIsoString()
     let yesterdaysIso = returnIsoString(true)
+    let lastWeeksIso = returnIsoString(false, true)
 
+    // check dates and archive
+    globalUser.app_notifications.forEach(n => {
+      if (n.createdAt < lastWeeksIso) {
+        n.status = 'archived'
+      }
+    })
+    saveToLocal()
+    // collect all viewable ones
+    let viewableNotifications = globalUser.app_notifications.filter(n => n.status !== 'archived').sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     // render out recent, yesterdays, and a while ago
-    const todaysNotifications = globalUser.app_notifications.filter(n => n.createdAt.split('T')[0] === todaysIso.split("T")[0])
-    const yesterdaysNotifications = globalUser.app_notifications.filter(n => n.createdAt.split('T')[0] === yesterdaysIso.split("T")[0])
-    const beyondNotifications = globalUser.app_notifications.filter(n => n.createdAt.split('T')[0] < yesterdaysIso.split("T")[0])
+    const todaysNotifications = viewableNotifications.filter(n => n.createdAt.split('T')[0] === todaysIso.split("T")[0])
+    const yesterdaysNotifications = viewableNotifications.filter(n => n.createdAt.split('T')[0] === yesterdaysIso.split("T")[0])
+    const beyondNotifications = viewableNotifications.filter(n => n.createdAt.split('T')[0] < yesterdaysIso.split("T")[0])
 
     notificationsSection.append(`
   ${todaysNotifications.length >= 1 ? `<p>Today</p>
     ${todaysNotifications.map(n => (
       notificationItemComponent(n)
-    ))}
+    )).join("")}
     `: ""}
   ${yesterdaysNotifications.length >= 1 ? `<p>Yesterday</p>
     ${yesterdaysNotifications.map(n => (
       notificationItemComponent(n)
-    ))}
+    )).join("")}
     `: ""}
   ${beyondNotifications.length >= 1 ? `<p>Beyond</p>
     ${beyondNotifications.map(n => (
       notificationItemComponent(n)
-    ))}
+    )).join("")}
     `: ""}
   `)
 
   } else {
     notificationsSection.append(`
-      <p>You have no new notifications</p>   
+      <p class="text-center">You have no new notifications</p>   
       `)
   }
 }
@@ -245,7 +261,7 @@ userBirthdayInput.on('input', function () {
   userYearsOld.text(`Your age: ${getAgeFromDateInput(birthday)}`)
 })
 
-
+// getting started welcome
 welcomeGetStartedBtn.on('click', function (e) {
   e.preventDefault()
   let birthday = userBirthdayInput.val()
@@ -258,9 +274,15 @@ welcomeGetStartedBtn.on('click', function (e) {
   globalUser.userAge = getAgeFromDateInput(birthday)
   globalUser.userBirthday = birthday
   globalUser.userStatus = 'ready'
+
+  // create welcome notification
+  let newNotification = new AppNotifications('welcome', "Welcome!", `Thank you for choosing to use BPT to be your go to app for blood pressure tracking! It is an honor you are using our app over many others on the web. We hope that this can be a solid place for you to keep track of all the important things. Please let us know your feedback to help improve this app. Click the button below to do a quick 2 min survey if interested, thank you!`, "#", 'Give Feedback')
+  globalUser.app_notifications.push(newNotification)
+
   // save user
   saveToLocal();
   loadInSettings();
+  renderAppNotifications()
   // close the welcome modal
   welcomeOverlay.fadeOut(() => {
     userBirthdayInput.val('')
@@ -387,13 +409,13 @@ const handleSaveCabinetItem = (data) => {
 
 const addAppAlert = (type, text, time = 5000) => {
   const notifyId = generateBPId()
-  const notification = $(appAlertComponent(type, text, notifyId))
+  const alert = $(appAlertComponent(type, text, notifyId))
 
-  notificationContainer.prepend(notification)
+  appAlertContainer.prepend(alert)
 
   setTimeout(() => {
-    notification.fadeOut(400, () => {
-      notification.remove()
+    alert.fadeOut(400, () => {
+      alert.remove()
     })
   }, time)
 }
@@ -442,6 +464,9 @@ const loadEditCabinetCardForm = (cardId) => {
 
 // toggle footer button classes
 const toggleCurrentPage = (currentButton, currentSection, title) => {
+  // set State
+  currentAppSection = title
+  // section title map
   const sectionTitleMap = {
     bloodPressure: "Blood Pressure Tracker",
     cabinet: "Cabinet",
@@ -464,10 +489,8 @@ const toggleCurrentPage = (currentButton, currentSection, title) => {
   $(currentButton).removeClass('border-zinc-50/0 fill-zinc-950 dark:fill-zinc-50')
   $(currentButton).addClass('border-blue-600 fill-blue-600')
 
-  if (currentSection === 'notifications') {
-    notificationsMarkAllReadBtn.show()
-  } else {
-    notificationsMarkAllReadBtn.hide()
+  if (title === 'notifications') {
+    renderAppNotifications()
   }
 }
 
@@ -501,7 +524,6 @@ const setPage = (pageId) => {
 
 $(() => {
   loadUserOrCreate();
-  setPage('notifications')
   // new input for systolic and diastolic
   // formats the value inside of these inputs
   addBloodPressureInput.on("input", handleSysAndDiaFormat);
@@ -522,6 +544,15 @@ $(() => {
       noteElmVal,
       globalUser.age
     )
+
+    // check if first entry
+    if (globalUser.bp_data.length === 0 && !globalUser.has_created_first_reading) {
+      let newNotification = new AppNotifications('first-bp-reading', 'Great Job!', 'You created your first Blood Pressure Reading! Keep it going so you can really take charge in your blood pressure management!')
+      globalUser.app_notifications.push(newNotification)
+      globalUser.has_created_first_reading = true
+
+      renderAppNotifications()
+    }
 
     // save to globaluser
     globalUser.bp_data.push(newBpEntry);
@@ -605,7 +636,7 @@ $(() => {
 
   // actions
   footerAddBtn.click(() => {
-    if (currentPage === 'bloodPressure') {
+    if (currentAppSection === 'bloodPressure') {
       modalOverlay.fadeIn()
       addBpEntryModal.slideDown()
     } else {
@@ -671,9 +702,9 @@ $(() => {
 
   notificationsSection.on('click', ".notification-btn", function () {
     let notificationId = $(this).data().notificationid
-    let foundNotification = globalUser.app_notifications.find(n=>n.id === notificationId)
+    let foundNotification = globalUser.app_notifications.find(n => n.id === notificationId)
     // don't need to render dom if already read
-    if(foundNotification.read){
+    if (foundNotification.read) {
       return
     }
 
@@ -752,7 +783,7 @@ $(() => {
       if (!globalUser.allow_notifications) {
         addAppAlert('alert', 'Notifications have been turned on', 7000)
         let timeout = setTimeout(() => {
-          sendNotification('enabled-notifications', 'Notifications have been enabled')
+          sendNotification('enabled-notifications', 'Notifications', 'Notifications have been successfully enabled!', globalUser)
           globalUser.allow_notifications = true
           saveToLocal()
           clearTimeout(timeout)
@@ -904,7 +935,7 @@ $(() => {
       globalUser.allow_notifications = true
       saveToLocal()
 
-      sendNotification('enabled-notifications', 'Notifications have been enabled')
+      sendNotification('enabled-notifications', 'Notifications', 'Notifications have been successfully enabled!', globalUser)
     } else {
       globalUser.allow_notifications = false
       saveToLocal()
