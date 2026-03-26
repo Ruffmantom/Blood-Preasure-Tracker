@@ -777,7 +777,7 @@ $(() => {
       }
 
       if (addCabinetReceivedQtyInput.val() <= 0) {
-        addAppAlert('warning', `Please add a Available Qty if you would like to be notified.`)
+        addAppAlert('warning', `Please add a received QTY if you would like to be notified for refill.`)
       }
 
       if (!globalUser.allow_notifications) {
