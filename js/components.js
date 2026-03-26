@@ -110,12 +110,12 @@ const notificationItemComponent = (data) => {
       ${data.read ? "" : `<div class="bg-blue-600 absolute top-[-4px] right-[-4px] rounded-full h-4 w-4"></div>`}
 
         <div class="flex flex-col gap-2 relative">
-          <div data-notificationid="" class="notification-btn absolute z-[2] top-0 left-0 w-full"></div>
-          <p class=" text-base font-medium">Time to refill!</p>
-          <p class="text-sm font-light">It looks like your labetalol 200mg is almost out and ready for a refill. be sure to contact your pharmacy to see if it is ready.</p>
+          <div data-notificationid=${data.id} class="notification-btn absolute z-[2] top-0 left-0 w-full h-full"></div>
+          <p class=" text-base font-medium">${data.title}</p>
+          <p class="text-sm font-light">${data.message}</p>
         </div>
-        <a href="#" class="p-3 bg-blue-600 text-white w-full text-center rounded-sm">Refill Now</a>
-        <p class="text-xs">03/19/2026 : 10:31 am</p>
+        ${data.link ? `<a href="${data.link}" class="p-3 bg-blue-600 text-white w-full text-center rounded-sm">Refill Now</a>` : ""}
+        <p class="text-xs">${formatDate(data.createdAt)}</p>
       </div>
   
   `

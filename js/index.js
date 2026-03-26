@@ -40,6 +40,7 @@ const cabinetFormOverflow = $("#cabinet-form-overflow")
 const settingsNotifyTakeBpTimeBlock = $("#settings-notify-take-bp-time-block")
 const addCabinetItemTrackingQtyAndStartedCont = $("#add-cabinet-item-tracking-qty-and-started-cont")
 const addCabinetItemTrackingNotifyCont = $("#add-cabinet-item-tracking-notify-cont")
+const notificationCheckMark = $("#notification-check-mark")
 
 // inputs
 const addBloodPressureInput = $("#add-blood-pressure-input")
@@ -224,6 +225,7 @@ footerNotificationsBtn.html(bell())
 footerAddBtn.html(add())
 loadingOverlayLogo.html(digitalLogo())
 welcomeLogo.html(digitalLogo())
+notificationCheckMark.html(check())
 
 
 

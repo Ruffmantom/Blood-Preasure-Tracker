@@ -94,9 +94,22 @@ const renderCabinetCards = () => {
 
 // load in all notifications
 const renderAppNotifications = () => {
+  notificationsSection.empty()
+  // check if there are un read ones and if so show button at top
+  let num = 0
+  globalUser.app_notifications.forEach(n => {
+    if (!n.read) {
+      num + 1
+    }
+  })
+  if (num >= 2) {
+    // show mark all as read btn
+    notificationsMarkAllReadBtn.show()
+  }
   if (globalUser.app_notifications.length >= 1) {
     let todaysIso = returnIsoString()
     let yesterdaysIso = returnIsoString(true)
+
     // render out recent, yesterdays, and a while ago
     const todaysNotifications = globalUser.app_notifications.filter(n => n.createdAt.split('T')[0] === todaysIso.split("T")[0])
     const yesterdaysNotifications = globalUser.app_notifications.filter(n => n.createdAt.split('T')[0] === yesterdaysIso.split("T")[0])
@@ -129,8 +142,9 @@ const renderAppNotifications = () => {
 
 notificationsMarkAllReadBtn.click(e => {
   e.preventDefault()
-  let a = new AppNotifications("test", "Time for a refill!", `It looks like your Labetalol 200mg is almost out and ready for a refill. be sure to contact your pharmacy to see if it is ready.`, '#')
-  globalUser.app_notifications.push(a)
+  globalUser.app_notifications.forEach(n => {
+    n.read = true
+  })
   saveToLocal()
   renderAppNotifications()
 })
@@ -449,6 +463,12 @@ const toggleCurrentPage = (currentButton, currentSection, title) => {
   $(currentSection).show()
   $(currentButton).removeClass('border-zinc-50/0 fill-zinc-950 dark:fill-zinc-50')
   $(currentButton).addClass('border-blue-600 fill-blue-600')
+
+  if (currentSection === 'notifications') {
+    notificationsMarkAllReadBtn.show()
+  } else {
+    notificationsMarkAllReadBtn.hide()
+  }
 }
 
 // set and load page
@@ -469,6 +489,7 @@ const setPage = (pageId) => {
     // add and remove classes
     toggleCurrentPage(footerSettingsBtn, settingsSection, pageId)
   } else if (pageId === 'notifications') {
+
     // footer Add
     footerTop.hide()
     // add and remove classes
@@ -646,6 +667,24 @@ $(() => {
     currentBloodPressureCardId = cardId
     modalOverlay.fadeIn()
     editBpEntryModal.slideDown()
+  })
+
+  notificationsSection.on('click', ".notification-btn", function () {
+    let notificationId = $(this).data().notificationid
+    let foundNotification = globalUser.app_notifications.find(n=>n.id === notificationId)
+    // don't need to render dom if already read
+    if(foundNotification.read){
+      return
+    }
+
+    globalUser.app_notifications.forEach(n => {
+      if (n.id === notificationId) {
+        n.read = true
+      }
+    })
+
+    saveToLocal()
+    renderAppNotifications()
   })
 
   // open edit blood pressure entry
