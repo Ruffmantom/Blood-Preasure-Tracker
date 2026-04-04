@@ -1,5 +1,5 @@
 // variables
-let appVersion = "2.1.1";
+let appVersion = "2.1.2";
 const localUserId = 'O1LHQAMLTTIUVI2USHPGZOKKAJOVU4PCCBKF26Q7ZRNNHK496PPOV9THXRRGXEKH7T6M8WDXNKYLIDSWHQFMMSPWHCRLBPJKJ4YM'
 
 // State
@@ -68,6 +68,7 @@ const addCabinetRefillLinkInput = $('#add-cabinet-refill-link-input')
 const addCabinetPharmacyInput = $('#add-cabinet-pharmacy-input')
 
 const updateUserBirthdayInput = $('#update-user-birthday-input')
+const uploadAllUserDataInput = $('#upload-all-user-data-input')
 // settings
 const settingsAllowNotifyInput = $("#settings-allow-notify-input")
 const settingsNotifyTakeBpInput = $("#settings-notify-take-bp-input")
@@ -114,7 +115,9 @@ const deleteCabinetItemBtn = $('#delete-cabinet-item-btn')
 const closeConfirmClearBtn = $("#close-confirm-clear-btn")
 const confirmClearAllDataBtn = $("#confirm-clear-all-data-btn")
 const footerBtn = $('.footer-btn')
-const notificationsMarkAllReadBtn = $('#notifications-mark-all-read-btn')
+const downloadAllUserDataBtn = $('#download-all-user-data-btn')
+const uploadAllUserDataBtn = $('#upload-all-user-data-btn')
+
 // toggle
 const themeToggleHandlerBtn = $('#theme-toggle-handler-btn')
 const parentToggle = $('#parent-toggle')
@@ -177,8 +180,8 @@ class CabinetItem {
         }
         this.notes = notes
         this.tracking = {
-            startDate: dateStarted,
-            startQty: receivedQty, // reset refill will override this
+            startDate: dateStarted,// reset refill will override this
+            startQty: receivedQty, 
             refillReminderBy: returnRefillDate(dateStarted, receivedQty, amount, schedule)
         }
         this.refillLink = refillLink
@@ -230,7 +233,6 @@ footerNotificationsBtn.html(bell())
 footerAddBtn.html(add())
 loadingOverlayLogo.html(digitalLogo())
 welcomeLogo.html(digitalLogo())
-notificationCheckMark.html(check())
 
 
 

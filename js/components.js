@@ -86,13 +86,12 @@ const cabinetItemComponent = (data) => {
               ${data.type === "Supplement" ? leaf() : pill()}
               <p class="text-xs">${data.type}</p>
           </div>
-          ${data.notifyUser ? `<p class="text-xs text-green-600">Refill reminder</p>` : ""}
+          ${data.notifyUser ? `<div class=" flex gap-1 justify-center items-center"><span class="fill-green-600">${reminder()}</span><span class="text-xs text-green-600">Refill reminder</span></div>` : ""}
         </div>
         <p class="text-xl font-bold">${data.name} - ${data.strength.value}${data.strength.unit}</p>
         <p class="text-sm">Taking ${data.dose.value} ${formatForm()} ${data.dose.schedule}</p>
         ${data.pharmacy ? `<p class="text-sm">Pharmacy: ${data.pharmacy}</p>` : ""}
         ${data.notes ? `<p class="text-sm">"${data.notes}"</p>` : ""}
-        ${data.needsRefill ? `<p class="text-xs italic">Estimated ${data.daysWorth} left</p>` : ""}
       </div>
       ${data.refillLink ? `<a href="${data.refillLink}" target="_blank" class="p-3 bg-zinc-200 dark:bg-zinc-800 dark:text-white text-zinc-950 w-full text-center rounded-sm">Refill Link</a>` : ""}
       ${data.needsRefill ? `<button data-itemid="${data.id}" target="_blank" class="cabinet-item-reset-refill-btn p-3 bg-blue-600 text-white w-full text-center rounded-sm">Reset Refill</button>` : ""}

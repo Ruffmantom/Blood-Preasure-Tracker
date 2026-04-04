@@ -100,11 +100,6 @@ const renderAppNotifications = () => {
     }
   })
 
-  if (num >= 2 && currentAppSection === "notifications") {
-    // show mark all as read btn
-    notificationsMarkAllReadBtn.show()
-  }
-
   // render the footer button
   if (num >= 1) {
     footerNotificationBtnPing.show()
@@ -132,21 +127,30 @@ const renderAppNotifications = () => {
     const beyondNotifications = viewableNotifications.filter(n => n.createdAt.split('T')[0] < yesterdaysIso.split("T")[0])
 
     notificationsSection.append(`
-  ${todaysNotifications.length >= 1 ? `<p>Today</p>
-    ${todaysNotifications.map(n => (
+      ${num >= 2 ? `<button id="notifications-mark-all-read-btn"
+      class="flex gap-1 items-center mb-2 text-xs"><span
+      class="dark:fill-zinc-50 fill-zinc-950">${check()}</span>Mark all as read</button>` : ""}
+
+      <div class="overflow-y-auto px-2 w-full flex flex-col grow gap-3 overflow-x-clip pb-4">
+        ${todaysNotifications.length >= 1 ? `<p>Today</p>
+          ${todaysNotifications.map(n => (
       notificationItemComponent(n)
     )).join("")}
-    `: ""}
-  ${yesterdaysNotifications.length >= 1 ? `<p>Yesterday</p>
-    ${yesterdaysNotifications.map(n => (
+        `: ""}
+
+        ${yesterdaysNotifications.length >= 1 ? `<p>Yesterday</p>
+          ${yesterdaysNotifications.map(n => (
       notificationItemComponent(n)
     )).join("")}
-    `: ""}
-  ${beyondNotifications.length >= 1 ? `<p>Beyond</p>
-    ${beyondNotifications.map(n => (
+        `: ""}
+
+        ${beyondNotifications.length >= 1 ? `<p>Beyond</p>
+          ${beyondNotifications.map(n => (
       notificationItemComponent(n)
     )).join("")}
-    `: ""}
+        `: ""}
+      </div>
+
   `)
 
   } else {
@@ -156,7 +160,8 @@ const renderAppNotifications = () => {
   }
 }
 
-notificationsMarkAllReadBtn.click(e => {
+// clear all unread notifications
+notificationsSection.on('click', '#notifications-mark-all-read-btn', function (e) {
   e.preventDefault()
   globalUser.app_notifications.forEach(n => {
     n.read = true
@@ -374,7 +379,6 @@ const handleSaveCabinetItem = (data) => {
   globalUser.cabinet_data.forEach(d => {
     // find data
     if (d.id === currentCabinetCardId) {
-      // check to see if user has edited the note
       d.type = data.type
       d.name = data.name
       d.form = data.form
@@ -385,10 +389,10 @@ const handleSaveCabinetItem = (data) => {
       d.notes = data.notes
       d.tracking.startDate = data.startDate
       d.tracking.startQty = data.receivedQty
+      d.tracking.refillReminderBy = returnRefillDate(data.startDate, data.receivedQty, data.amount, data.schedule)
       d.notifyUser = data.notifyUser
       d.refillLink = data.refillLink
       d.pharmacy = data.pharmacy
-      d.notifyDate = returnRefillDate(data.startDate, data.receivedQty, data.amount, data.schedule)
     }
   })
   // save to local
@@ -702,6 +706,7 @@ $(() => {
 
   notificationsSection.on('click', ".notification-btn", function () {
     let notificationId = $(this).data().notificationid
+    logger(`notificationsSection.on('click'`, `${notificationId}`)
     let foundNotification = globalUser.app_notifications.find(n => n.id === notificationId)
     // don't need to render dom if already read
     if (foundNotification.read) {
@@ -735,14 +740,17 @@ $(() => {
     addCabinetItemModal.slideDown()
   })
 
-  // reset refill
-  cabinetSection.on('click', ".cabinet-item-reset-refill-btn", function (e) {
+
+  // reset refill status
+  cabinetSection.on('click', ".cabinet-item-reset-refill-btn", function () {
     let id = $(this).data().itemid
     globalUser.cabinet_data.forEach(item => {
       if (item.id === id) {
-        item.daysWorth = item.originalQty
+        let todaysDate = returnIsoString()
+        let refillDate = returnRefillDate(todaysDate, item.tracking.startQty, item.dose.value, item.dose.schedule)
+        item.tracking.startDate = todaysDate
+        item.tracking.refillReminderBy = refillDate
         item.needsRefill = false
-        item.notifyDate = returnRefillDate(item.originalQty, item.amount, item.schedule)
       }
     })
 
@@ -774,17 +782,29 @@ $(() => {
     if (addCabinetNotifyInput.is(':checked')) {
       if (addCabinetScheduleInput.val() === 'As needed') {
         addAppAlert('warning', `You have "As needed" selected. Please choose a different schedule to enable refill notifications.`)
+        addCabinetNotifyInput.prop('checked', false);
+        return
       }
 
       if (addCabinetReceivedQtyInput.val() <= 0) {
         addAppAlert('warning', `Please add a received QTY if you would like to be notified for refill.`)
+        addCabinetNotifyInput.prop('checked', false);
+        return
+      }
+
+      if (!addCabinetStartedInput.val()) {
+        addAppAlert('warning', `You need to make sure to add a "Started taking" date.`)
+        addCabinetNotifyInput.prop('checked', false);
+        return
       }
 
       if (!globalUser.allow_notifications) {
+        // change settings
         addAppAlert('alert', 'Notifications have been turned on', 7000)
         let timeout = setTimeout(() => {
           sendNotification('enabled-notifications', 'Notifications', 'Notifications have been successfully enabled!', globalUser)
           globalUser.allow_notifications = true
+          settingsAllowNotifyInput.prop('checked', true)
           saveToLocal()
           clearTimeout(timeout)
         }, 3000);
@@ -938,7 +958,15 @@ $(() => {
       sendNotification('enabled-notifications', 'Notifications', 'Notifications have been successfully enabled!', globalUser)
     } else {
       globalUser.allow_notifications = false
+      // turn off all notifications for cabinet items
+      globalUser.cabinet_data.forEach(item => {
+        if (item.notifyUser) {
+          item.notifyUser = false
+        }
+      })
       saveToLocal()
+      // reload cabinet items
+      renderCabinetCards()
     }
   })
 
@@ -961,5 +989,48 @@ $(() => {
     globalUser.notifyUser_take_bp_when = settingsNotifyTakeBpTimeInput.val()
     saveToLocal()
   })
+  // download user data
+  downloadAllUserDataBtn.click(e => {
+    e.preventDefault()
+    downloadDevData(globalUser)
+  })
 
+  // upload user data
+  uploadAllUserDataBtn.click(e => {
+    e.preventDefault()
+    uploadAllUserDataInput.trigger('click');
+  })
+
+
+  uploadAllUserDataInput.on('change', function () {
+    const file = this.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    console.log("File", file)
+    reader.onload = function (e) {
+      try {
+        const jsonData = JSON.parse(e.target.result);
+        console.log(jsonData)
+        //save to user
+        globalUser = jsonData
+
+        saveToLocal()
+
+      } catch (err) {
+        addAppAlert('danger', 'There was an issue uploading your data.')
+      }
+    };
+
+    reader.onerror = function () {
+      addAppAlert('danger', 'There was an issue reading your data.')
+    };
+
+    reader.readAsText(file);
+    // reload page
+
+    addAppAlert('alert', "Data has been uploaded! About to reload the app.")
+    setTimeout(() => {
+      window.location.reload(true);
+    }, 3000)
+  })
 });

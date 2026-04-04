@@ -165,6 +165,28 @@ function downloadTxt(data, filename = "data.txt") {
   URL.revokeObjectURL(url);
 }
 
+function downloadDevData(data, filename = "dev_data.json") {
+  // Build the text content using the stringData format
+  const jsonString = JSON.stringify(data);
+  // Create a plain-text blob and trigger download
+  const blob = new Blob([jsonString], { type: "application/json" });
+
+  // IE fallback
+  if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+    window.navigator.msSaveOrOpenBlob(blob, filename);
+    return;
+  }
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
 const returnBpCategoryClass = (cat) => {
   let className = ""
   switch (cat) {
@@ -326,7 +348,7 @@ const getTodayString = () => {
 };
 
 
-const sendNotification = (tag = "", title = "", message = "",globalUser = null) => {
+const sendNotification = (tag = "", title = "", message = "", globalUser = null) => {
   Notification.requestPermission(perm => {
     if (perm && globalUser.allow_notifications) {
       new Notification(title, {
@@ -410,4 +432,11 @@ function launchConfettiBurst(options = {}) {
   /*
   launchConfettiBurst({ count: 140 });
   */
+}
+
+const logger = (title = "", msg = "", obj = null) => {
+  if (obj) {
+    return console.log(`[${title}]: ${msg}`, obj)
+  }
+  return console.log(`[${title}]: ${msg}`)
 }

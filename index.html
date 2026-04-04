@@ -310,9 +310,6 @@
   <div id="header-section" class="p-4 pt-12 flex justify-between items-center">
     <p class="text-lg font-medium" id="header-title">Blood Pressure Tracker</p>
     <div id="header-btn-section" class="">
-      <button style="display: none;" id="notifications-mark-all-read-btn"
-        class="flex gap-1 items-center px-1 text-xs"><span id="notification-check-mark"
-          class="dark:fill-zinc-50 fill-zinc-950"></span>Mark all as read</button>
     </div>
   </div>
 
@@ -379,15 +376,25 @@
         <label for="blood-pressure-input">Data</label>
         <button id="copy-blood-pressure-data-btn" class="p-3 bg-blue-600 text-white w-full text-center rounded-sm">Copy
           Blood Pressure Data</button>
-        <button id="clear-all-data-btn" class="p-3 mt-3 bg-red-600 text-white w-full text-center rounded-sm">Clear all
+        <button id="clear-all-data-btn" class="p-3 mt-3 bg-red-600 text-white w-full text-center rounded-sm">Clear my
           data</button>
+      </div>
+      <div class="flex flex-col gap-1">
+        <label for="blood-pressure-input">Development Data</label>
+        <p class="text-xs">This data is used for development purposes.</p>
+        <button id="download-all-user-data-btn"
+          class="p-3 bg-blue-600 text-white w-full text-center rounded-sm">Download JSON</button>
+        <input hidden id="upload-all-user-data-input" type="file" accept=".json, application/json"
+          class="p-3 bg-blue-600 text-white w-full text-center rounded-sm"></input>
+        <button id="upload-all-user-data-btn"
+          class="p-3 bg-blue-600 text-white w-full text-center rounded-sm">Upload Data</button>
       </div>
 
       <p class="text-xs">App Version: <span id="version">0.0.0</span></p>
     </div>
 
     <!-- Notifications section -->
-    <div style="display: none;" id="notifications-section" class="section-container flex flex-col gap-2">
+    <div style="display: none;" id="notifications-section" class="section-container flex flex-col h-full max-h-full gap-2">
 
     </div>
 
